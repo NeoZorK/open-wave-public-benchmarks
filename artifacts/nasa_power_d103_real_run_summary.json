@@ -1,0 +1,54 @@
+{
+  "schema": "nasa_power_d103_real_run_summary_public_v1",
+  "source_milestone": "1.0.146",
+  "protocol_version": "1.0.143",
+  "protocol_doc": "docs/protocols/NASA_POWER_D103_PREREG_CHARTER.md",
+  "source": {
+    "official_base_url": "https://power.larc.nasa.gov/api/temporal/daily/point",
+    "community": "RE",
+    "parameters": ["ALLSKY_SFC_SW_DWN", "T2M", "WS10M", "PRECTOTCORR"],
+    "time_standard": "UTC",
+    "format": "JSON",
+    "period": "2015-01-01..2024-12-31",
+    "points": ["POWER_A", "POWER_B", "POWER_C"],
+    "raw_payload_committed": false
+  },
+  "inputs": [
+    {
+      "point": "POWER_A",
+      "name": "Kyiv",
+      "sha256": "aa2301d3ad6adfa26d1127fb2da922931a5a7b8a3a3fc40de4e67fcb0df17a70",
+      "rows": 3653
+    },
+    {
+      "point": "POWER_B",
+      "name": "Lviv",
+      "sha256": "ae4b097e9994154a84a1e630a3d35fd11886d2c371385ebdd25395b7affabc6d",
+      "rows": 3653
+    },
+    {
+      "point": "POWER_C",
+      "name": "Odesa",
+      "sha256": "26c6cc5e26dcd5633894c6cca5a08f541617a25f1362b9a470a723b1d36732a2",
+      "rows": 3653
+    }
+  ],
+  "report_sha256": "7d73479b1c99a68317e7440d1a9f890bd91b131b011873ae3ce994cacd11a2ef",
+  "external_payload_manifest_sha256": "7ef2e8d6503e8ef540f6f1c85547d21a13a9a0dd913128cb9953a468b90a0bd7",
+  "result": {
+    "source_audit_passed": true,
+    "eligible_point_count": 3,
+    "eligible_windows": 15,
+    "overall_go_no_go": true,
+    "result_status": "PASSED_UNDER_PROTOCOL",
+    "allowed_narrow_claim": "passed the pre-registered NASA POWER D-103 gate under protocol 1.0.143"
+  },
+  "residual_risks": [
+    "single domain and single frozen task only",
+    "Ukraine point scope only",
+    "daily NASA POWER data product only",
+    "not operational deployment evidence",
+    "not machine-learning evidence",
+    "independent reproduction/audit recommended"
+  ]
+}

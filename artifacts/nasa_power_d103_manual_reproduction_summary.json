@@ -1,0 +1,82 @@
+{
+  "schema": "nasa_power_d103_manual_reproduction_summary_public_v1",
+  "source_milestone": "1.0.147",
+  "audit_date": "2026-04-29",
+  "audit_verdict": "REPRODUCED_OUTCOME_WITH_SOURCE_BYTE_DRIFT",
+  "protocol_version": "1.0.143",
+  "protocol_doc": "docs/protocols/NASA_POWER_D103_PREREG_CHARTER.md",
+  "source_eligibility": {
+    "applicant_confirmed": true,
+    "status": "OK",
+    "free_public": true,
+    "public_research_use_ok": true,
+    "attribution_required": true,
+    "summary_redistribution_blocker_identified": false,
+    "official_references": [
+      "https://power.larc.nasa.gov/docs/services/api/temporal/daily/",
+      "https://power.larc.nasa.gov/docs/referencing/",
+      "https://www.earthdata.nasa.gov/about/esdis/esco/standards-practices/data-use-citation-guidance",
+      "https://www.earthdata.nasa.gov/about/open-science"
+    ]
+  },
+  "manual_inputs": [
+    {
+      "point": "POWER_A",
+      "name": "Kyiv",
+      "sha256": "57aad6c53a72997838f27d4f736ac6bcc5195c59f05e4c82b5db041ee9e3935c",
+      "rows": 3653,
+      "skipped": 0,
+      "finite_parameter_coverage": 1.0
+    },
+    {
+      "point": "POWER_B",
+      "name": "Lviv",
+      "sha256": "d433313a7e2c17c9b511ef9a6986499515297841c764653d9e6f40e1a1ef70cb",
+      "rows": 3653,
+      "skipped": 0,
+      "finite_parameter_coverage": 1.0
+    },
+    {
+      "point": "POWER_C",
+      "name": "Odesa",
+      "sha256": "f402f6bb20e62674cbb28eefb9b9597dbaf947b43b65b07b3bf419d3592a1ebd",
+      "rows": 3653,
+      "skipped": 0,
+      "finite_parameter_coverage": 1.0
+    }
+  ],
+  "manual_report": {
+    "sha256": "db0ba9e8809976a74771b4bb8b93d33ff0c7e29db33284a3081e694dc4443a91",
+    "source_audit_passed": true,
+    "eligible_point_count": 3,
+    "eligible_windows": 15,
+    "overall_go_no_go": true,
+    "result_status": "PASSED_UNDER_PROTOCOL",
+    "allowed_narrow_claim": "passed the pre-registered NASA POWER D-103 gate under protocol 1.0.143"
+  },
+  "original_report": {
+    "sha256": "7d73479b1c99a68317e7440d1a9f890bd91b131b011873ae3ce994cacd11a2ef"
+  },
+  "claim_boundary": {
+    "allowed": "passed the pre-registered NASA POWER D-103 gate under protocol 1.0.143; independently reproduced at outcome/gate level on 2026-04-29",
+    "forbidden": [
+      "raw payload hash reproduced exactly",
+      "broad or universal forecasting edge",
+      "energy-grid deployment readiness",
+      "all statistical methods beaten",
+      "private-background performance",
+      "private-background performance",
+      "machine-learning breakthrough"
+    ]
+  },
+  "open_methods_used": [
+    "public NASA POWER parser/adapter",
+    "frozen public pre-registration runner",
+    "train-only low-solar-resource z-score candidate",
+    "frozen public baselines and controls",
+    "public benchmark acceptance framework"
+  ],
+  "private_background_used": false,
+  "raw_payload_committed": false,
+  "full_manual_report_committed": false
+}
