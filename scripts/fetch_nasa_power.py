@@ -76,11 +76,6 @@ def _build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Override dataset_id (default derived from point and mode).",
     )
-    parser.add_argument(
-        "--license-note",
-        default=None,
-        help="Free-text license/attribution note for the manifest.",
-    )
     return parser
 
 
@@ -127,8 +122,6 @@ def main() -> int:
         rows=len(days),
         repo_semver=repro.get("repo_semver") if isinstance(repro, dict) else None,
         git_commit_short=repro.get("git_commit_short") if isinstance(repro, dict) else None,
-        payload_path=args.json_path,
-        license_note=args.license_note,
     )
     print(f"point={point_id}")
     print(f"mode={args.mode}")

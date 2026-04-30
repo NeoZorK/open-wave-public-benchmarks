@@ -205,8 +205,6 @@ def write_nasa_power_manifest(
     rows: int,
     repo_semver: str | None,
     git_commit_short: str | None,
-    payload_path: str | Path | None = None,
-    license_note: str | None = None,
     manifest_path: str | Path | None = None,
 ) -> Path:
     csv_path_obj = Path(csv_path)
