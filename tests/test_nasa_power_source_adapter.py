@@ -170,7 +170,7 @@ def test_cli_json_file_mode_writes_csv_and_manifest(
     assert payload["rows"] == 3
     assert "payload_basename" not in payload
     assert "payload_sha256" not in payload
-    assert payload["source_file_sha256"]
+    assert "source_file_sha256" not in payload
 
 
 def test_cli_json_file_mode_requires_input(

@@ -251,10 +251,6 @@ def write_nasa_power_manifest(
             "not establish a positive empirical claim"
         ),
     }
-    if payload_path is not None:
-        payload = Path(payload_path)
-        if payload.is_file():
-            manifest["source_file_sha256"] = _sha256_of_file(payload)
     if license_note:
         manifest["license_note"] = license_note
     out_path = (
