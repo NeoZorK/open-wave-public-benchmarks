@@ -367,7 +367,7 @@ def evaluate_nasa_power_prereg(
             "broad or universal forecasting performance",
             "deployment readiness",
             "energy-grid operational readiness",
-            "private-background performance claim",
+            "non-public background performance claim",
         ],
         "honest_boundary": (
             "This report evaluates local NASA POWER JSON payloads under the frozen "

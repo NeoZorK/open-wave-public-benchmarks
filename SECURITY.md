@@ -1,0 +1,46 @@
+# Security Policy
+
+## Supported Versions
+
+Open Wave Public Benchmarks is currently pre-1.0 public research tooling. Security fixes are applied to the default branch and to the latest tagged release when practical.
+
+| Version | Supported |
+| ------- | --------- |
+| Latest `main` | Yes |
+| Latest tagged release | Yes |
+| Older releases | No, unless a severe issue affects public users |
+
+## Reporting a Vulnerability
+
+Please report suspected vulnerabilities privately through GitHub Security Advisories:
+
+<https://github.com/NeoZorK/open-wave-public-benchmarks/security/advisories/new>
+
+Do not open a public issue for vulnerabilities involving:
+
+- dependency compromise;
+- CI or GitHub Actions permissions;
+- repository publication guard bypasses;
+- accidental exposure of raw payloads, local paths, credentials, tokens, or private-source material;
+- unsafe handling of operator-supplied files.
+
+## Expected Response
+
+I aim to acknowledge valid reports within 7 calendar days. If the report is accepted, I will try to provide a fix, mitigation, or documented decision within 30 calendar days, depending on severity and available maintainer time.
+
+If the report is declined, I will explain the reason where possible.
+
+## Project-Specific Boundaries
+
+This repository is public Open Core/Open Wave benchmark foreground. It must not contain raw external payloads, credentials, private local paths, Closed Core source code, or private production integrations.
+
+Security reports about private systems, Closed Core implementations, or unrelated infrastructure are out of scope for this public repository unless they demonstrate a direct leak or vulnerability in the public benchmark code.
+
+## Safe Handling Notes
+
+When reproducing benchmarks:
+
+- keep raw payloads outside the repository;
+- publish hashes, manifests, summaries, and claim boundaries only;
+- do not include access tokens, cookies, API keys, or private local paths in reports;
+- verify generated artifacts before committing.

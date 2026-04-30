@@ -40,18 +40,14 @@ def main() -> int:
     for path in args.json:
         if not path.is_file():
             raise SystemExit(f"input file not found: {path}")
-    report = evaluate_nasa_power_prereg(
+    evaluation = evaluate_nasa_power_prereg(
         point_ids=list(args.point),
         json_paths=list(args.json),
         pre_registration_doc_path=args.pre_registration_doc,
     )
     args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.report.write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")
+    args.report.write_text(json.dumps(evaluation, indent=2, sort_keys=True), encoding="utf-8")
     print(f"report={args.report}")
-    print(f"overall_go_no_go={report.get('overall_go_no_go')}")
-    print(f"result_status={report.get('result_status')}")
-    print(f"eligible_point_count={report.get('eligible_point_count')}")
-    print(f"eligible_windows={report.get('eligible_windows')}")
     return 0
 
 

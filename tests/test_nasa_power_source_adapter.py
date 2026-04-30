@@ -168,7 +168,9 @@ def test_cli_json_file_mode_writes_csv_and_manifest(
     payload = json.loads(manifest.read_text(encoding="utf-8"))
     assert payload["source_mode"] == "nasa_power_json_file"
     assert payload["rows"] == 3
-    assert payload["payload_basename"] == "power.json"
+    assert "payload_basename" not in payload
+    assert "payload_sha256" not in payload
+    assert payload["source_file_sha256"]
 
 
 def test_cli_json_file_mode_requires_input(

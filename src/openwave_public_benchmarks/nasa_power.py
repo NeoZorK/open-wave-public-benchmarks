@@ -253,9 +253,8 @@ def write_nasa_power_manifest(
     }
     if payload_path is not None:
         payload = Path(payload_path)
-        manifest["payload_basename"] = payload.name
         if payload.is_file():
-            manifest["payload_sha256"] = _sha256_of_file(payload)
+            manifest["source_file_sha256"] = _sha256_of_file(payload)
     if license_note:
         manifest["license_note"] = license_note
     out_path = (
