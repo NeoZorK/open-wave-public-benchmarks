@@ -11,7 +11,6 @@ CSV. It does not fetch network payloads and does not run the empirical gate.
 from __future__ import annotations
 
 import csv
-import hashlib
 import json
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
@@ -195,14 +194,6 @@ def write_nasa_power_solar_ohlcv_csv(
     return out_path
 
 
-def _sha256_of_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as fh:
-        for chunk in iter(lambda: fh.read(64 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def write_nasa_power_manifest(
     csv_path: str | Path,
     *,
@@ -240,8 +231,7 @@ def write_nasa_power_manifest(
         "start_date": start_date.isoformat(),
         "end_date": end_date.isoformat(),
         "rows": int(rows),
-        "csv_basename": csv_path_obj.name,
-        "csv_sha256": _sha256_of_file(csv_path_obj),
+        "generated_csv_committed": False,
         "repo_semver": repo_semver,
         "git_commit_short": git_commit_short,
         "raw_payload_committed": False,
