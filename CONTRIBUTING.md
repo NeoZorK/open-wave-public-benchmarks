@@ -1,5 +1,7 @@
 # Contributing
 
+Participation falls under the [Code of Conduct](CODE_OF_CONDUCT.md).
+
 Contributions are welcome when they preserve the evidence boundary.
 
 Rules:

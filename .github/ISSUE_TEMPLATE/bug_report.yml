@@ -1,0 +1,48 @@
+name: Bug Report
+description: Report incorrect tooling behavior, test failures, or reproducibility breakage (non-security).
+labels: ["bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing a clear report. Raw external payloads belong **outside**
+        this repository; do **not** attach CSV/JSON/parquet payloads or secrets.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What broke and what outcome you expected.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction steps
+      description: Commands, filenames, hashes if applicable — no secrets.
+    validations:
+      required: false
+
+  - type: input
+    id: uv_version
+    attributes:
+      label: uv version (optional)
+      placeholder: e.g. 0.x
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized traceback or CLI output (optional)
+      render: bash
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Confirmations
+      options:
+        - label: My report excludes raw external payloads and private identifiers.
+          required: true

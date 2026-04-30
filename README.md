@@ -1,5 +1,7 @@
 # Open Wave Public Benchmarks
 
+![OpenWave public benchmarks logo](docs/assets/openwave-logo.png)
+
 Open Wave Public Benchmarks is an open-source foreground for pre-registered
 public time-series evaluation.
 
@@ -85,6 +87,13 @@ download, then run, then publish the exact result status.
 
 This repository is independently usable as an open benchmark foreground. It does
 not include, import, or require private background technology.
+
+## Community
+
+- [Contributing guide](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security policy](SECURITY.md)
+- [Discussions — maintainer announcements and community Q&A](https://github.com/NeoZorK/open-wave-public-benchmarks/discussions)
 
 ## License
 
