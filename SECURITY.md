@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Open Wave Public Benchmarks is currently pre-1.0 public research tooling. Security fixes are applied to the default branch and to the latest tagged release when practical.
+ClaimBound Public Benchmarks is currently pre-1.0 public research tooling. Security fixes are applied to the default branch and to the latest tagged release when practical.
 
 | Version | Supported |
 | ------- | --------- |
@@ -14,7 +14,7 @@ Open Wave Public Benchmarks is currently pre-1.0 public research tooling. Securi
 
 Please report suspected vulnerabilities privately through GitHub Security Advisories:
 
-<https://github.com/NeoZorK/open-wave-public-benchmarks/security/advisories/new>
+<https://github.com/NeoZorK/claimbound-public-benchmarks/security/advisories/new>
 
 Do not open a public issue for vulnerabilities involving:
 
@@ -32,7 +32,7 @@ If the report is declined, I will explain the reason where possible.
 
 ## Project-Specific Boundaries
 
-This repository is public Open Core/Open Wave benchmark foreground. It must not contain raw external payloads, credentials, private local paths, Closed Core source code, or private production integrations.
+This repository is public ClaimBound benchmark foreground. It must not contain raw external payloads, credentials, private local paths, Closed Core source code, or private production integrations.
 
 Security reports about private systems, Closed Core implementations, or unrelated infrastructure are out of scope for this public repository unless they demonstrate a direct leak or vulnerability in the public benchmark code.
 

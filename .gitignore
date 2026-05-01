@@ -1,8 +1,17 @@
 .DS_Store
+docs/.DS_Store
+.direnv/
+.envrc
+.python-version
+.coverage
+htmlcov/
+.idea/
+.vscode/
 .venv/
 __pycache__/
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
 dist/
 build/
 *.egg-info/
@@ -13,7 +22,8 @@ raw/
 *.parquet
 *.zip
 *.env
+*.local
+*.log
 *.key
 *.pem
 *.jsonl
-

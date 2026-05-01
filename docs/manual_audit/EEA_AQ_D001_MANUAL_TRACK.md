@@ -3,6 +3,9 @@
 This document is a fillable manual checklist for a future public-domain audit.
 It is not a completed result.
 
+General manual audit rules are defined in
+[docs/MANUAL_AUDIT_PROTOCOL.md](../MANUAL_AUDIT_PROTOCOL.md).
+
 ## No-AI Declaration
 
 ```text
@@ -70,15 +73,15 @@ station identifier
 Create raw folders outside this repository:
 
 ```bash
-mkdir -p ~/openwave_raw/eea_aq_d001/raw
-mkdir -p ~/openwave_raw/eea_aq_d001/hashes
-mkdir -p ~/openwave_raw/eea_aq_d001/reports
+mkdir -p ~/claimbound_raw/eea_aq_d001/raw
+mkdir -p ~/claimbound_raw/eea_aq_d001/hashes
+mkdir -p ~/claimbound_raw/eea_aq_d001/reports
 ```
 
 After download:
 
 ```bash
-cd ~/openwave_raw/eea_aq_d001/raw
+cd ~/claimbound_raw/eea_aq_d001/raw
 shasum -a 256 * > ../hashes/raw_payloads.sha256
 ```
 

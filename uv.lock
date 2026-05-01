@@ -91,7 +91,7 @@ wheels = [
 ]
 
 [[package]]
-name = "openwave-public-benchmarks"
+name = "claimbound-public-benchmarks"
 version = "0.2.0"
 source = { editable = "." }
 dependencies = [
