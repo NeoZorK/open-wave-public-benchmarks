@@ -47,6 +47,24 @@ def test_valid_evidence_card_passes() -> None:
     assert validate_evidence_card(_valid_card()) == []
 
 
+def test_committed_evidence_cards_validate_and_are_indexed() -> None:
+    card_dir = REPO_ROOT / "docs" / "evidence_cards"
+    registry_path = REPO_ROOT / "docs" / "registry" / "evidence_index.json"
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    indexed_paths = {entry["path"] for entry in registry["cards"]}
+
+    cards = sorted(card_dir.glob("CLAIMBOUND-*.json"))
+    assert cards
+    assert registry["card_count"] == len(cards)
+
+    for path in cards:
+        card = json.loads(path.read_text(encoding="utf-8"))
+        assert validate_evidence_card(card) == []
+        rel = path.relative_to(REPO_ROOT).as_posix()
+        assert rel in indexed_paths
+        assert card["raw_payload_committed"] is False
+
+
 def test_evidence_card_requires_execution_mode() -> None:
     card = _valid_card()
     card.pop("execution_mode")
@@ -86,4 +104,3 @@ def test_evidence_card_cli_reports_violations(
     assert module.main() == 1
     captured = capsys.readouterr()
     assert "execution_mode must be one of" in captured.err
-

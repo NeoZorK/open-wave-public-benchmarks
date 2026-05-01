@@ -88,6 +88,17 @@ This proves correctness outside the protocol boundary.
 
 ## Example
 
+Current committed examples:
+
+- [NASA POWER D-103 passed evidence card](evidence_cards/CLAIMBOUND-NASA-POWER-D103-2026-04-29.json)
+  and [visual SVG](evidence_cards/CLAIMBOUND-NASA-POWER-D103-2026-04-29.svg)
+- [NOAA CO-OPS D-131 negative evidence card](evidence_cards/CLAIMBOUND-NOAA-COOPS-D131-2026-04-30.json)
+  and [visual SVG](evidence_cards/CLAIMBOUND-NOAA-COOPS-D131-2026-04-30.svg)
+
+The visual share-card template is
+[docs/assets/claimbound_evidence_card.svg](assets/claimbound_evidence_card.svg).
+It contains placeholder fields and should be filled from validated card JSON.
+
 ```json
 {
   "evidence_id": "CLAIMBOUND-NASA-POWER-D103-2026-04-29",
@@ -145,3 +156,14 @@ uv run python scripts/claimbound_validate_evidence_card.py path/to/evidence_card
 The validator is deterministic. It does not try to infer hidden AI use from
 writing style. It requires explicit provenance fields and rejects incomplete or
 overbroad records.
+
+## Sharing And Registry
+
+To share a result, link directly to its JSON evidence card in
+`docs/evidence_cards/`. A visual card can be rendered from the same data by
+filling the SVG template fields.
+
+The public registry index is stored in `docs/registry/evidence_index.json`.
+It is intended to remain freely readable and to expose aggregate counts by
+status, domain and source. The registry stores card metadata and sanitized
+report references, not raw payloads.

@@ -20,7 +20,6 @@ small enough to audit, and the claim boundary can be written in plain language.
 | LLM forecast resolution | Did a timestamped model forecast resolve correctly against official sources? | Gives model claims a checkable trail instead of a screenshot. |
 | Agent or tool claim check | Did a coding, research or analysis agent pass a frozen task gate? | Helps compare systems without changing the task after seeing output. |
 | Research-method appendix | Can a paper or report link to a compact evidence record? | Adds a durable, reviewable companion to ordinary publication. |
-| Funding-proposal pilot evidence | Can a team show disciplined public-source evaluation before scaling? | Demonstrates process quality without overstating performance. |
 | Teaching reproducible ML | Can students run, fail, reproduce and explain a protocol? | Trains audit discipline, not only leaderboard optimization. |
 | Public infrastructure audit | Did a public operations signal pass a fixed protocol on official data? | Supports transparent civic analytics without deployment claims. |
 | Climate-source audit | Is an official climate or weather-derived source usable under a protocol? | Makes source drift, coverage and rights visible. |
@@ -80,19 +79,6 @@ Good first scope:
 - Brier score or another pre-selected scoring rule;
 - no prompt changes after the answer is recorded;
 - ambiguous resolutions recorded as blocked, not forced into pass or fail.
-
-## Funding-Proposal Use
-
-ClaimBound can support a funding proposal by showing public evidence discipline:
-
-- a protocol exists before the run;
-- the source boundary is explicit;
-- the result can be positive, negative, blocked or insufficient coverage;
-- claims are limited to the documented protocol;
-- evidence cards can be inspected and rerun by outside operators.
-
-The main value is the evidence process. Individual positive results are examples
-of the process, not broad performance claims.
 
 ## Where ClaimBound Should Not Be Used
 
