@@ -136,6 +136,9 @@ def test_cli_mock_mode_writes_csv_and_manifest(
     payload = json.loads(manifest.read_text(encoding="utf-8"))
     assert payload["source_mode"] == "mock"
     assert payload["rows"] == 7
+    assert payload["point_location_redacted"] is True
+    assert "latitude" not in payload
+    assert "longitude" not in payload
     assert payload["raw_payload_committed"] is False
     assert "synthetic plumbing only" in payload["honest_boundary"]
 
@@ -168,6 +171,9 @@ def test_cli_json_file_mode_writes_csv_and_manifest(
     payload = json.loads(manifest.read_text(encoding="utf-8"))
     assert payload["source_mode"] == "nasa_power_json_file"
     assert payload["rows"] == 3
+    assert payload["point_location_redacted"] is True
+    assert "latitude" not in payload
+    assert "longitude" not in payload
     assert "payload_basename" not in payload
     assert "payload_sha256" not in payload
     assert "source_file_sha256" not in payload

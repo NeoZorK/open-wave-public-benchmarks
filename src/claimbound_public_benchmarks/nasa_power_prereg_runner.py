@@ -230,8 +230,7 @@ def _load_point_payload(
     source = {
         "point_id": pid,
         "point_name": point.name,
-        "latitude": point.latitude,
-        "longitude": point.longitude,
+        "point_location_redacted": True,
         "json": json_path.name,
         "json_sha256": _sha256_of_file(json_path),
         "rows": parse_summary["rows"],
@@ -309,8 +308,7 @@ def evaluate_nasa_power_prereg(
             {
                 "point_id": point.point_id,
                 "point_name": point.name,
-                "latitude": point.latitude,
-                "longitude": point.longitude,
+                "point_location_redacted": True,
                 "source": source,
                 "coverage_ok": coverage_ok,
                 "windows": point_windows,

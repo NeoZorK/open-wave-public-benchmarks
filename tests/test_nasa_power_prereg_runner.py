@@ -94,6 +94,13 @@ def test_nasa_power_prereg_runner_report_shape(tmp_path: Path) -> None:
     )
     assert "rolling_solar_shortfall_zscore_30d" in report["acceptance"]["baseline_names"]
     assert "candidate_no_solar_context" in report["acceptance"]["baseline_names"]
+    for point_report in report["points"]:
+        assert point_report["point_location_redacted"] is True
+        assert "latitude" not in point_report
+        assert "longitude" not in point_report
+        assert point_report["source"]["point_location_redacted"] is True
+        assert "latitude" not in point_report["source"]
+        assert "longitude" not in point_report["source"]
 
 
 def test_nasa_power_prereg_cli_help(monkeypatch: pytest.MonkeyPatch) -> None:
