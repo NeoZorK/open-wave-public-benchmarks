@@ -1,6 +1,12 @@
 # Open Wave Public Benchmarks
 
-![OpenWave public benchmarks logo](docs/assets/openwave-logo.png)
+<p align="center">
+  <img
+    src="docs/assets/openwave-logo-x400.png"
+    alt="OpenWave public benchmarks logo"
+    width="400"
+  />
+</p>
 
 Open Wave Public Benchmarks is an open-source foreground for pre-registered
 public time-series evaluation.
