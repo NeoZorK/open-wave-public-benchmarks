@@ -55,21 +55,18 @@ official public source
   -> result status and sanitized evidence summary
 ```
 
-Result statuses are defined in [docs/RESULT_STATUS.md](docs/RESULT_STATUS.md).
-Claim boundaries are defined in [docs/CLAIMS.md](docs/CLAIMS.md).
-Project positioning is defined in
-[docs/PROJECT_POSITIONING.md](docs/PROJECT_POSITIONING.md).
-The honesty manifesto is in [docs/HONESTY_MANIFESTO.md](docs/HONESTY_MANIFESTO.md).
-AI-assisted operation rules are in
-[docs/AI_OPERATOR_PROTOCOL.md](docs/AI_OPERATOR_PROTOCOL.md).
-Manual audit rules are in
-[docs/MANUAL_AUDIT_PROTOCOL.md](docs/MANUAL_AUDIT_PROTOCOL.md).
-Evidence cards are specified in [docs/EVIDENCE_CARD.md](docs/EVIDENCE_CARD.md).
-Concrete use cases are listed in [docs/USE_CASES.md](docs/USE_CASES.md).
-Funding alignment is summarized in
-[docs/FUNDING_ALIGNMENT.md](docs/FUNDING_ALIGNMENT.md).
-The longer registry direction is described in
-[docs/GLOBAL_EVIDENCE_REGISTRY.md](docs/GLOBAL_EVIDENCE_REGISTRY.md).
+## Core Documents
+
+- Evidence rules: [result statuses](docs/RESULT_STATUS.md),
+  [claim boundaries](docs/CLAIMS.md) and
+  [evidence cards](docs/EVIDENCE_CARD.md).
+- Operating protocols: [manual audit](docs/MANUAL_AUDIT_PROTOCOL.md) and
+  [AI-assisted operation](docs/AI_OPERATOR_PROTOCOL.md).
+- Project direction: [positioning](docs/PROJECT_POSITIONING.md),
+  [honesty manifesto](docs/HONESTY_MANIFESTO.md) and
+  [use cases](docs/USE_CASES.md).
+- Growth path: [funding alignment](docs/FUNDING_ALIGNMENT.md) and
+  [global evidence registry](docs/GLOBAL_EVIDENCE_REGISTRY.md).
 
 ## Install
 
