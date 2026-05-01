@@ -112,17 +112,3 @@ Recommended early domains:
 
 Avoid domains where the public record would require private data, ambiguous
 source rights or after-result interpretation.
-
-## Funding-Proposal Fit
-
-ClaimBound is best presented as infrastructure for trustworthy public evidence:
-
-- reproducible AI and ML evaluation;
-- negative-result preservation;
-- public-source claim boundaries;
-- source-lineage manifests;
-- independent reproduction records;
-- small evidence cards that reviewers and external operators can inspect.
-
-The durable contribution is a reusable evidence discipline. Individual positive
-results are examples, not the main claim.

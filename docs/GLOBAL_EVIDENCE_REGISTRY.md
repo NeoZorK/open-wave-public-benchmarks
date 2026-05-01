@@ -7,6 +7,24 @@ The goal is not to replace research repositories, benchmark suites or DOI
 archives. The goal is to provide a thin, verifiable layer that links a narrow
 claim to a protocol, source audit, result status, hashes and reproduction level.
 
+## Public Access Model
+
+The registry should be publicly readable and free to inspect.
+
+The initial registry lives in
+[docs/registry/evidence_index.json](registry/evidence_index.json). It lists
+validated evidence cards, share URLs and aggregate statistics by status, domain
+and source.
+
+Future hosted versions may provide a database-backed search layer, but the
+public contract stays the same:
+
+- card metadata is public;
+- aggregate statistics are public;
+- raw payloads are not stored in the public registry;
+- every result links back to a repository path that another operator can
+  inspect.
+
 ## Registry Unit
 
 The registry unit should be an evidence card, not a large raw dataset.

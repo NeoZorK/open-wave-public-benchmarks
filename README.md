@@ -35,11 +35,16 @@ independently reproduced at outcome/gate level on 2026-04-29.
 Additional records show source lineage and negative/blocked outcomes:
 
 - NOAA CO-OPS D-131: official-source run completed; statistical acceptance did
-  not pass.
+  not pass. See the
+  [NOAA evidence card](docs/evidence_cards/CLAIMBOUND-NOAA-COOPS-D131-2026-04-30.json).
 - NYC TLC Phase 4: official-source run completed; statistical acceptance did
   not pass.
 - CDC mirror path: public mirror proof path completed, but external source
   equivalence remained unresolved.
+
+The NASA POWER D-103 positive record has a
+[shareable JSON evidence card](docs/evidence_cards/CLAIMBOUND-NASA-POWER-D103-2026-04-29.json)
+and a [visual SVG card](docs/evidence_cards/CLAIMBOUND-NASA-POWER-D103-2026-04-29.svg).
 
 This does not imply a universal forecasting edge, deployment readiness, or
 superiority over all statistical methods.
@@ -65,8 +70,7 @@ official public source
 - Project direction: [positioning](docs/PROJECT_POSITIONING.md),
   [honesty manifesto](docs/HONESTY_MANIFESTO.md) and
   [use cases](docs/USE_CASES.md).
-- Growth path: [funding alignment](docs/FUNDING_ALIGNMENT.md) and
-  [global evidence registry](docs/GLOBAL_EVIDENCE_REGISTRY.md).
+- Registry direction: [global evidence registry](docs/GLOBAL_EVIDENCE_REGISTRY.md).
 
 ## Install
 
@@ -104,6 +108,12 @@ download, then run, then publish the exact result status.
 ClaimBound records are intended to become compact evidence cards: protocol ID,
 source, access date, result status, claim boundary, hashes, git commit and
 reproduction level.
+
+The current examples are listed in
+[docs/evidence_cards/README.md](docs/evidence_cards/README.md). The public
+registry index is [docs/registry/evidence_index.json](docs/registry/evidence_index.json).
+The SVG share-card template is
+[docs/assets/claimbound_evidence_card.svg](docs/assets/claimbound_evidence_card.svg).
 
 The long-term direction is a small global evidence registry for narrow
 pre-registered public results. The registry should store sanitized cards and

@@ -1,0 +1,45 @@
+{
+  "registry_name": "ClaimBound Public Evidence Registry",
+  "registry_version": "0.1",
+  "public_access": "free_read_only",
+  "raw_payload_policy": "raw payloads are not stored in the public registry",
+  "card_count": 2,
+  "cards": [
+    {
+      "evidence_id": "CLAIMBOUND-NASA-POWER-D103-2026-04-29",
+      "path": "docs/evidence_cards/CLAIMBOUND-NASA-POWER-D103-2026-04-29.json",
+      "share_url": "https://github.com/NeoZorK/claimbound-public-benchmarks/blob/main/docs/evidence_cards/CLAIMBOUND-NASA-POWER-D103-2026-04-29.json",
+      "svg_url": "https://github.com/NeoZorK/claimbound-public-benchmarks/blob/main/docs/evidence_cards/CLAIMBOUND-NASA-POWER-D103-2026-04-29.svg",
+      "result_status": "PASSED_UNDER_PROTOCOL",
+      "domain": "renewable-energy-resource",
+      "official_source_name": "NASA POWER Daily point API",
+      "reproduction_level": "REPRODUCED_OUTCOME_WITH_SOURCE_BYTE_DRIFT",
+      "sanitized_report_path": "artifacts/nasa_power_d103_real_run_summary.json"
+    },
+    {
+      "evidence_id": "CLAIMBOUND-NOAA-COOPS-D131-2026-04-30",
+      "path": "docs/evidence_cards/CLAIMBOUND-NOAA-COOPS-D131-2026-04-30.json",
+      "share_url": "https://github.com/NeoZorK/claimbound-public-benchmarks/blob/main/docs/evidence_cards/CLAIMBOUND-NOAA-COOPS-D131-2026-04-30.json",
+      "svg_url": "https://github.com/NeoZorK/claimbound-public-benchmarks/blob/main/docs/evidence_cards/CLAIMBOUND-NOAA-COOPS-D131-2026-04-30.svg",
+      "result_status": "NEGATIVE_RESULT_UNDER_PROTOCOL",
+      "domain": "coastal-water-level",
+      "official_source_name": "NOAA CO-OPS Data API",
+      "reproduction_level": "not independently reproduced",
+      "sanitized_report_path": "artifacts/noaa_coops_d131_negative_result_summary.json"
+    }
+  ],
+  "statistics": {
+    "by_result_status": {
+      "NEGATIVE_RESULT_UNDER_PROTOCOL": 1,
+      "PASSED_UNDER_PROTOCOL": 1
+    },
+    "by_domain": {
+      "coastal-water-level": 1,
+      "renewable-energy-resource": 1
+    },
+    "by_source": {
+      "NASA POWER Daily point API": 1,
+      "NOAA CO-OPS Data API": 1
+    }
+  }
+}
