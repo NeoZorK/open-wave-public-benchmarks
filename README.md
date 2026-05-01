@@ -93,14 +93,14 @@ JSON payloads outside the repository and recording their hashes.
 Detailed reproduction instructions are in
 [docs/REPRODUCTION.md](docs/REPRODUCTION.md).
 
-## Manual Domain Track
+## Manual Domain Tracks
 
-A future public-domain manual track template is included for European air
-quality data:
+Future public-domain track runbooks are included for European air quality data:
 
-[docs/manual_audit/EEA_AQ_D001_MANUAL_TRACK.md](docs/manual_audit/EEA_AQ_D001_MANUAL_TRACK.md)
+- [No-AI manual track](docs/manual_audit/EEA_AQ_D001_MANUAL_TRACK.md)
+- [AI-assisted manual track](docs/manual_audit/EEA_AQ_D001_AI_ASSISTED_TRACK.md)
 
-This template is designed for a no-AI operator audit: rules first, then source
+These runbooks are designed for operator audits: rules first, then source
 download, then run, then publish the exact result status.
 
 ## Evidence Cards And Registry Direction
