@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
-"""Pure-numpy doc-11 baseline pool for Open Wave non-PnL anomaly/regime evaluation.
+"""Pure-numpy doc-11 baseline pool for ClaimBound non-PnL anomaly/regime evaluation.
 
 Each baseline produces a causal, train-only-normalized outlier score over a
 closing-price series. Higher score = more anomalous. Outputs are aligned
-with the input series and ready to be compared against Open Wave feature-group
+with the input series and ready to be compared against ClaimBound feature-group
 scores under paired acceptance gates (doc 11 / doc 53).
 
 Six reference baselines, all deterministic, NumPy-only, no lookahead:

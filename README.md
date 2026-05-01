@@ -1,18 +1,18 @@
-# Open Wave Public Benchmarks
+# ClaimBound Public Benchmarks
 
 <p align="center">
   <img
-    src="docs/assets/openwave-logo-x400.png"
-    alt="OpenWave public benchmarks logo"
+    src="docs/assets/claimbound_logo.svg"
+    alt="ClaimBound public benchmarks logo"
     width="400"
   />
 </p>
 
-Open Wave Public Benchmarks is an open-source foreground for pre-registered
-public time-series evaluation.
+ClaimBound Public Benchmarks is an open-source foreground for pre-registered
+public-source evidence records for narrow AI/ML claims.
 
 It is not a production forecasting service. It is a public toolkit for checking
-whether a narrow time-series claim was tested under rules fixed before the run.
+whether a narrow claim was tested under rules fixed before the run.
 
 The project focuses on reproducibility discipline:
 
@@ -57,19 +57,32 @@ official public source
 
 Result statuses are defined in [docs/RESULT_STATUS.md](docs/RESULT_STATUS.md).
 Claim boundaries are defined in [docs/CLAIMS.md](docs/CLAIMS.md).
+Project positioning is defined in
+[docs/PROJECT_POSITIONING.md](docs/PROJECT_POSITIONING.md).
+The honesty manifesto is in [docs/HONESTY_MANIFESTO.md](docs/HONESTY_MANIFESTO.md).
+AI-assisted operation rules are in
+[docs/AI_OPERATOR_PROTOCOL.md](docs/AI_OPERATOR_PROTOCOL.md).
+Manual audit rules are in
+[docs/MANUAL_AUDIT_PROTOCOL.md](docs/MANUAL_AUDIT_PROTOCOL.md).
+Evidence cards are specified in [docs/EVIDENCE_CARD.md](docs/EVIDENCE_CARD.md).
+Concrete use cases are listed in [docs/USE_CASES.md](docs/USE_CASES.md).
+Funding alignment is summarized in
+[docs/FUNDING_ALIGNMENT.md](docs/FUNDING_ALIGNMENT.md).
+The longer registry direction is described in
+[docs/GLOBAL_EVIDENCE_REGISTRY.md](docs/GLOBAL_EVIDENCE_REGISTRY.md).
 
 ## Install
 
 ```bash
 uv sync --extra dev
-uv run pytest -n auto
+uv run --extra dev python -m pytest -n auto
 ```
 
 ## Offline Smoke
 
 ```bash
-uv run python scripts/fetch_nasa_power.py --help
-uv run python scripts/openwave_run_nasa_power_prereg.py --help
+uv run --extra dev python scripts/fetch_nasa_power.py --help
+uv run --extra dev python scripts/claimbound_run_nasa_power_prereg.py --help
 ```
 
 The real NASA POWER payload files used for the recorded D-103 run are not
@@ -89,6 +102,19 @@ quality data:
 This template is designed for a no-AI operator audit: rules first, then source
 download, then run, then publish the exact result status.
 
+## Evidence Cards And Registry Direction
+
+ClaimBound records are intended to become compact evidence cards: protocol ID,
+source, access date, result status, claim boundary, hashes, git commit and
+reproduction level.
+
+The long-term direction is a small global evidence registry for narrow
+pre-registered public results. The registry should store sanitized cards and
+hashes, not raw payloads. Blockchain, token, wallet, on-chain storage and chain
+timestamp features are outside the current roadmap and have no scheduled review
+date. The core trust model remains public code, source lineage, frozen gates and
+independent reproduction.
+
 ## Boundary
 
 This repository is independently usable as an open benchmark foreground. It does
@@ -99,7 +125,7 @@ not include, import, or require private background technology.
 - [Contributing guide](CONTRIBUTING.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Security policy](SECURITY.md)
-- [Discussions — maintainer announcements and community Q&A](https://github.com/NeoZorK/open-wave-public-benchmarks/discussions)
+- [Discussions — maintainer announcements and community Q&A](https://github.com/NeoZorK/claimbound-public-benchmarks/discussions)
 
 ## License
 

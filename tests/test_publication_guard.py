@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Publication guard for the Open Wave foreground repository."""
+"""Publication guard for the ClaimBound foreground repository."""
 
 from __future__ import annotations
 

@@ -17,15 +17,15 @@ from typing import Mapping
 import numpy as np
 from numpy.typing import NDArray
 
-from openwave_public_benchmarks.baseline_groups import (
+from claimbound_public_benchmarks.baseline_groups import (
     Doc11AcceptanceConfig,
     WindowObservation,
     evaluate_group_vs_baseline_pool,
 )
-from openwave_public_benchmarks.generic_ohlcv_batch_pre_registration_meta import (
+from claimbound_public_benchmarks.generic_ohlcv_batch_pre_registration_meta import (
     build_generic_ohlcv_batch_reproducibility,
 )
-from openwave_public_benchmarks.nasa_power import (
+from claimbound_public_benchmarks.nasa_power import (
     NASA_POWER_POINTS,
     normalize_point_id,
     parse_nasa_power_json_file,

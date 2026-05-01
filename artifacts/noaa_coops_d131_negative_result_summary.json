@@ -1,5 +1,5 @@
 {
-  "schema": "openwave_negative_result_summary_v1",
+  "schema": "claimbound_negative_result_summary_v1",
   "domain": "NOAA_COOPS_D131",
   "protocol_version": "1.0.139",
   "source": {

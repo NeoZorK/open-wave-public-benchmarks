@@ -35,7 +35,7 @@ Official NASA POWER references:
 Run:
 
 ```bash
-uv run python scripts/openwave_run_nasa_power_prereg.py \
+uv run python scripts/claimbound_run_nasa_power_prereg.py \
   --point POWER_A --json /path/outside/repo/POWER_A.json \
   --point POWER_B --json /path/outside/repo/POWER_B.json \
   --point POWER_C --json /path/outside/repo/POWER_C.json \

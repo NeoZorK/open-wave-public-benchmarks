@@ -1,0 +1,147 @@
+# ClaimBound Evidence Card
+
+A ClaimBound evidence card is the public unit of record for one narrow result.
+
+It should be small enough to read, strict enough to validate, and complete
+enough for another operator to decide whether rerunning the protocol is
+possible.
+
+## Required Fields
+
+| Field | Purpose |
+| --- | --- |
+| `evidence_id` | Stable ID for this evidence record. |
+| `protocol_id` | ID of the frozen protocol. |
+| `protocol_version` | Version or commit-bound protocol reference. |
+| `domain` | Public domain under test, such as energy or air quality. |
+| `claim_type` | Type of claim: forecast, signal, source audit, reproduction or blocked-source record. |
+| `execution_mode` | Required provenance mode: `MANUAL_NO_AI`, `MANUAL_AI_ASSISTED`, `AUTOMATED_NO_AI`, `AUTOMATED_AI_ASSISTED` or `HYBRID_AI_ASSISTED`. |
+| `result_status` | Exact status from `docs/RESULT_STATUS.md`. |
+| `claim_boundary` | Plain-language limit on what the result does and does not show. |
+| `official_source_name` | Human-readable source name. |
+| `official_source_url` | URL for the official source or source documentation. |
+| `access_date` | Date the source was accessed. |
+| `source_rights_note` | Short note on rights, attribution and redistribution boundary. |
+| `raw_payload_committed` | Must be `false` unless rights and repository policy explicitly allow it. |
+| `raw_payload_manifest` | External hash manifest path, hash value or explanation when blocked. |
+| `sanitized_report_path` | Public sanitized report or summary artifact. |
+| `sanitized_report_sha256` | SHA-256 for the sanitized report. |
+| `git_commit` | Commit containing the protocol and public evidence record. |
+| `runner_command` | Exact command or manual-track reference used for the run. |
+| `operator` | Person, organization or role that performed the run. |
+| `created_at` | Date the evidence card was created. |
+| `reproduction_level` | Exact reproduction level from `docs/CLAIMS.md` when applicable. |
+| `ai_assistance` | Whether AI assisted with code, protocol drafting, summarization or validation. |
+| `manual_review` | Whether a human operator reviewed source rights, protocol boundary and final claim. |
+| `known_limitations` | Important limitations and reasons not to overclaim. |
+
+## Forecast-Specific Fields
+
+Forecast evidence cards must also include:
+
+| Field | Purpose |
+| --- | --- |
+| `forecast_question` | Exact question fixed before resolution. |
+| `answer_timestamp` | When the model or method answer was recorded. |
+| `forecast_deadline` | Last time the forecast could be made. |
+| `resolution_deadline` | When the outcome should be resolvable. |
+| `model_or_method` | System, model or fixed signal used. |
+| `prompt_hash` | Hash of the prompt or input template, when an LLM is used. |
+| `resolution_rule` | Exact rule for deciding the outcome. |
+| `allowed_resolution_sources` | Official sources accepted for resolution. |
+| `scoring_rule` | Pre-selected scoring rule. |
+
+## Execution Modes
+
+Use one exact mode:
+
+| Mode | Meaning |
+| --- | --- |
+| `MANUAL_NO_AI` | Human operator performed the track without AI assistance. |
+| `MANUAL_AI_ASSISTED` | Human operator performed the track and used AI only within `docs/AI_OPERATOR_PROTOCOL.md`. |
+| `AUTOMATED_NO_AI` | Deterministic automation performed the run without AI assistance. |
+| `AUTOMATED_AI_ASSISTED` | Automation used AI assistance, but deterministic validation produced the status. |
+| `HYBRID_AI_ASSISTED` | Manual and automated steps were combined, with AI assistance disclosed. |
+
+The execution mode is provenance metadata. It does not make a result more or
+less valid by itself. A result is valid only when the protocol, source boundary,
+hashes, status and claim boundary validate.
+
+## Required Interpretation
+
+The card must make the allowed claim and forbidden claims clear.
+
+Allowed:
+
+```text
+This protocol-bound record has status X under source Y, period Z and gate G.
+```
+
+Forbidden:
+
+```text
+This proves broad model superiority.
+This proves deployment readiness.
+This proves the raw source bytes will never drift.
+This proves correctness outside the protocol boundary.
+```
+
+## Example
+
+```json
+{
+  "evidence_id": "CLAIMBOUND-NASA-POWER-D103-2026-04-29",
+  "protocol_id": "NASA_POWER_D103",
+  "protocol_version": "1.0.143",
+  "domain": "renewable-energy-resource",
+  "claim_type": "signal",
+  "execution_mode": "MANUAL_NO_AI",
+  "result_status": "PASSED_UNDER_PROTOCOL",
+  "claim_boundary": "NASA POWER D-103 passed the frozen gate for the documented points, period, target, candidate, controls and acceptance rule only.",
+  "official_source_name": "NASA POWER Daily point API",
+  "official_source_url": "https://power.larc.nasa.gov/docs/services/api/temporal/daily/",
+  "access_date": "2026-04-29",
+  "source_rights_note": "Official public source. Raw payloads are not committed.",
+  "raw_payload_committed": false,
+  "raw_payload_manifest": "external SHA-256 manifest recorded outside the repository",
+  "sanitized_report_path": "artifacts/nasa_power_d103_real_run_summary.json",
+  "sanitized_report_sha256": "fill with report SHA-256",
+  "git_commit": "fill with commit SHA",
+  "runner_command": "uv run python scripts/claimbound_run_nasa_power_prereg.py ...",
+  "operator": "maintainer",
+  "created_at": "2026-04-29",
+  "reproduction_level": "reproduced at outcome/gate level with source-byte drift",
+  "ai_assistance": "not used for outcome selection or gate changes",
+  "manual_review": "source boundary and claim boundary reviewed by maintainer",
+  "known_limitations": [
+    "No universal forecasting edge is claimed.",
+    "No deployment readiness is claimed.",
+    "No raw-byte reproduction is claimed."
+  ]
+}
+```
+
+## Validation Rules
+
+Evidence cards should fail validation when:
+
+- `execution_mode` is missing or outside the allowed modes;
+- `result_status` is not one of the documented statuses;
+- `claim_boundary` is missing;
+- `raw_payload_committed` is `true`;
+- a forecast card lacks a resolution rule;
+- a positive record has no baseline or control summary;
+- a blocked record does not explain the block reason;
+- a reproduction record does not state the reproduction level;
+- AI assistance is not disclosed;
+- the card contains broad claims outside the protocol boundary.
+
+Run the local validator:
+
+```bash
+uv run python scripts/claimbound_validate_evidence_card.py path/to/evidence_card.json
+```
+
+The validator is deterministic. It does not try to infer hidden AI use from
+writing style. It requires explicit provenance fields and rejects incomplete or
+overbroad records.

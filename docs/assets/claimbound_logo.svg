@@ -1,6 +1,6 @@
 <svg width="1254" height="1254" viewBox="0 0 1254 1254" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">OpenWave public benchmarks logo</title>
-  <desc id="desc">A clean vector logo with an open circular wave benchmark icon, OpenWave wordmark, and public benchmarks subtitle.</desc>
+  <title id="title">ClaimBound public benchmarks logo</title>
+  <desc id="desc">A clean vector logo with a bounded evidence icon, ClaimBound wordmark, and public benchmarks subtitle.</desc>
 
   <defs>
     <linearGradient id="ringBlue" x1="73" y1="453" x2="348" y2="793" gradientUnits="userSpaceOnUse">
@@ -31,9 +31,9 @@
   <!-- White background intentionally preserved with equal visual breathing room above and below the logo. -->
   <rect width="1254" height="1254" fill="#FFFFFF"/>
 
-  <g id="openwave-logo" filter="url(#softShadow)">
+  <g id="claimbound-logo" filter="url(#softShadow)">
     <!-- Icon: open benchmark ring -->
-    <g id="openwave-icon" stroke-linecap="butt" stroke-linejoin="round">
+    <g id="claimbound-icon" stroke-linecap="butt" stroke-linejoin="round">
       <!-- subtle benchmark grid -->
       <g stroke="#CBD3DC" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="10 12" opacity="0.72">
         <path d="M130 507V714"/>
@@ -59,9 +59,9 @@
     </g>
 
     <!-- Wordmark -->
-    <g id="openwave-wordmark">
-      <text x="428" y="633" font-family="Inter, Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="124" font-weight="700" letter-spacing="-4" fill="#082F59">Open</text>
-      <text x="805" y="633" font-family="Inter, Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="124" font-weight="700" letter-spacing="-4" fill="url(#waveText)">Wave</text>
+    <g id="claimbound-wordmark">
+      <text x="428" y="633" font-family="Inter, Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="124" font-weight="700" letter-spacing="-2" fill="#082F59">Claim</text>
+      <text x="792" y="633" font-family="Inter, Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="124" font-weight="700" letter-spacing="-2" fill="url(#waveText)">Bound</text>
       <line x1="436" y1="700" x2="514" y2="700" stroke="#11AFA9" stroke-width="4"/>
       <text x="542" y="717" font-family="Inter, Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="38" font-weight="500" letter-spacing="13" fill="#082F59">public benchmarks</text>
       <line x1="1120" y1="700" x2="1194" y2="700" stroke="#11AFA9" stroke-width="4"/>

@@ -37,7 +37,7 @@ defined in README and SECURITY policy.
 
 ## Scope
 
-This applies to all interaction spaces tied to contributing to Open Wave Public
+This applies to all interaction spaces tied to contributing to ClaimBound Public
 Benchmarks — issues, discussions, PRs, and any project communications where contributors
 meet.
 
