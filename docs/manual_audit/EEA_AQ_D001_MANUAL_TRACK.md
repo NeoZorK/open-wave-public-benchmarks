@@ -1,65 +1,32 @@
-# EEA AQ D-001 Manual Track Runbook
+# EEA AQ D-001 Manual Track Checklist
 
-This document is a complete manual runbook for the EEA Air Quality D-001 track.
-It is not a completed result. Follow it from top to bottom when you are ready
-to produce a public ClaimBound evidence record.
+This is a command-driven manual checklist for the EEA Air Quality D-001 track. It is a runbook, not a completed result.
 
-The track is a source-readiness and coverage audit for official EEA air-quality
-PM10 data. It does not claim forecasting performance, deployment readiness, or
-model superiority.
+The track audits **source readiness and PM10 daily coverage only**. It does **not** claim forecasting performance, deployment readiness, model superiority, health impact, or production suitability.
 
-General manual audit rules are defined in
-[docs/MANUAL_AUDIT_PROTOCOL.md](../MANUAL_AUDIT_PROTOCOL.md).
+General manual audit rules are defined in [`docs/MANUAL_AUDIT_PROTOCOL.md`](../MANUAL_AUDIT_PROTOCOL.md).
 
-## Exact Files Used By This Run
+---
 
-This runbook uses exact files. When a step says "record", "copy", or "write",
-put the value into one of these files, not into an unnamed scratch note.
+## 0. Operator Promise
 
 ```text
-$RUN_ROOT/logs/operator_log.md
-  Main human-readable run log. Put source notes, download notes, processing
-  notes, status decision, deviations and limitations here.
-
-$RUN_ROOT/logs/run_env.sh
-  Shell variables that let you reopen a terminal and continue the same run.
-
-$RUN_ROOT/logs/protocol_lock.txt
-  Frozen protocol. Create it before data inspection and do not edit it after
-  hashing.
-
-$RUN_ROOT/hashes/protocol_lock.sha256
-  SHA-256 hash of the frozen protocol.
-
-$RUN_ROOT/hashes/raw_payloads.sha256
-  SHA-256 hashes of raw payload files stored outside the repository.
-
-$RUN_ROOT/hashes/raw_payloads_manifest.sha256
-  SHA-256 hash of the raw-payload hash manifest.
-
-$RUN_ROOT/reports/station_coverage.csv
-  Local detailed coverage table. Do not commit this unless it has been reviewed
-  and intentionally sanitized.
-
-$RUN_ROOT/reports/selected_sampling_points.csv
-  Local selected sampling points table. Do not commit this unless it has been
-  reviewed and intentionally sanitized.
-
-$RUN_ROOT/reports/eea_aq_d001_manual_summary.json
-  Sanitized summary that may be copied into the public repository after review.
+I fixed source, selection, target, controls, coverage rule and acceptance gate before scoring.
+I did not remove weak data after seeing outcomes.
+I did not tune thresholds after seeing outcomes.
+I did not rewrite a negative or blocked outcome as a positive claim.
+I recorded deviations and limitations.
 ```
 
-If you close the terminal and come back later, reload the run variables with:
+- [ ] I accept the operator promise.
+- [ ] I understand that pass, insufficient coverage, blocked source, and negative result are all valid honest outcomes.
+- [ ] I will keep raw payloads outside this repository.
 
-```bash
-source "$HOME/claimbound_runs/REPLACE-WITH-FOLDER/logs/run_env.sh"
-```
+---
 
-Replace `REPLACE-WITH-FOLDER` with the folder name printed by step 27.
+## 1. Fixed Scope
 
-## 0. Fixed Scope
-
-Do not change these fields after starting the run log.
+Do not change this after starting the run.
 
 ```text
 Track ID: EEA_AQ_D001
@@ -71,1172 +38,844 @@ Countries: NL, BE, DE
 Period: 2018-01-01 through 2024-12-31
 Aggregation: daily records
 Coverage gate: at least 85 percent daily coverage per sampling point
-Selection rule: first five eligible sampling points per country after sorting
-  by country code, city/locality if available, and sampling point ID
+Selection rule: first five eligible sampling points per country after sorting by country code, city/locality if available, and sampling point ID
 Raw payload policy: raw files stay outside this repository
-Public output policy: commit only sanitized summary, evidence card, and card SVG
+Public output policy: commit only sanitized summary, evidence card JSON, evidence card SVG, and registry update
 ```
 
 Allowed final statuses:
 
 - `PASSED_UNDER_PROTOCOL`
-- `NEGATIVE_RESULT_UNDER_PROTOCOL`
-- `BLOCKED_SOURCE`
 - `INSUFFICIENT_COVERAGE`
+- `BLOCKED_SOURCE`
+- `NEGATIVE_RESULT_UNDER_PROTOCOL`
 
-Status meanings for this track:
+Status decision rules:
 
-- Use `PASSED_UNDER_PROTOCOL` only if the source is accessible, rights are
-  acceptable for sanitized public evidence, and all three countries have at
-  least five eligible PM10 daily sampling points under the fixed coverage rule.
-- Use `NEGATIVE_RESULT_UNDER_PROTOCOL` if the source is accessible and rights
-  are acceptable, but the fixed gate does not pass for reasons other than
-  source blockage.
-- Use `BLOCKED_SOURCE` if access, rights, documentation, or file format prevents
-  a fair run.
-- Use `INSUFFICIENT_COVERAGE` if data exists but the fixed coverage requirement
-  cannot be met.
+- `PASSED_UNDER_PROTOCOL`: source is accessible, rights are acceptable for sanitized public evidence, and all three countries have at least five eligible PM10 daily sampling points.
+- `INSUFFICIENT_COVERAGE`: data is accessible and parseable, but at least one country has fewer than five eligible sampling points.
+- `BLOCKED_SOURCE`: access, rights, documentation, download, metadata, timestamps, units, or file format prevents a fair run.
+- `NEGATIVE_RESULT_UNDER_PROTOCOL`: valid non-coverage negative result under this fixed source-audit protocol.
 
-## 1. Official Source References
+- [ ] Fixed scope reviewed.
+- [ ] Status rules reviewed.
+- [ ] No source data inspected yet.
 
-Record these references in the run log before downloading anything.
+---
 
-- EEA AQ Portal download page:
-  <https://aqportal.discomap.eea.europa.eu/download-data/>
-- Air Quality Download web application:
-  <https://eeadmz1-downloads-webapp.azurewebsites.net/>
-- Air Quality Download API Swagger:
-  <https://eeadmz1-downloads-api-appservice.azurewebsites.net/swagger/index.html>
-- Air Quality Download documentation PDF:
-  <https://eeadmz1-downloads-webapp.azurewebsites.net/content/documentation/How_To_Downloads.pdf>
-- EEA copyright notice:
-  <https://www.eea.europa.eu/en/about/policy/copyright>
-- EEA reuse FAQ:
-  <https://www.eea.europa.eu/en/about/contact-us/faqs/can-i-use-eea-content-in-my-work-or-in-my-organisations-products>
+## 2. Exact Files Used By This Run
 
-The EEA download page describes the Air Quality Download Service as a source
-for verified E1a data and up-to-date E2a data. The EEA documentation PDF
-describes the web application, API, filters, download behavior, metadata,
-vocabulary, and parquet schema.
-
-## 2. Before You Start
-
-1. Open a terminal.
-2. Go to the public repository. This command makes the repository your current
-   working folder.
-
-   ```bash
-   cd /path/to/claimbound-public-benchmarks
-   ```
-
-3. Save the repository path in a shell variable. This lets later commands
-   return to the exact public repository.
-
-   ```bash
-   CLAIMBOUND_REPO="$(pwd -P)"
-   printf 'CLAIMBOUND_REPO=%s\n' "$CLAIMBOUND_REPO"
-   ```
-
-4. Confirm that the repository is clean.
-
-   ```bash
-   git status --short --branch
-   ```
-
-5. Expected output shape:
-
-   ```text
-   ## main...origin/main
-   ```
-
-6. If there are uncommitted changes, stop.
-7. Do not mix this manual run with unrelated edits.
-8. Confirm the current commit and store it in a variable.
-
-   ```bash
-   STARTING_GIT_COMMIT="$(git rev-parse --short HEAD)"
-   printf 'STARTING_GIT_COMMIT=%s\n' "$STARTING_GIT_COMMIT"
-   ```
-
-9. Confirm Python is available. This command prints the local Python version.
-
-   ```bash
-   python3 --version
-   ```
-
-10. Confirm checksum tooling is available. This command hashes `README.md`
-    without changing it.
-
-    ```bash
-    shasum -a 256 README.md | head -1
-    ```
-
-11. Store the current UTC timestamp in a variable.
-
-    ```bash
-    RUN_STARTED_UTC="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-    printf 'RUN_STARTED_UTC=%s\n' "$RUN_STARTED_UTC"
-    ```
-
-12. Do not write these values into the public repository. They will be written
-    into `$RUN_ROOT/logs/operator_log.md` after the run folder is created.
-
-## 3. Execution Mode Declaration
-
-13. Decide the execution mode before opening data files.
-14. Use `MANUAL_NO_AI` if you do not ask an AI tool to inspect data, choose
-    stations, tune gates, decide the status, or write the final claim.
-15. Use `MANUAL_AI_ASSISTED` if you ask an AI tool for help during the run.
-16. If you use AI assistance, record what was used and for what purpose.
-17. Do not use AI to choose favorable stations after seeing results.
-18. Do not use AI to rewrite a failed or blocked result as a success.
-19. Do not change the fixed scope after this point.
-
-Copy this declaration into the run log:
+Local-only files outside the repository:
 
 ```text
-Execution mode: MANUAL_NO_AI or MANUAL_AI_ASSISTED
-AI assistance used during execution: yes/no
-If yes, describe exactly:
-Operator name or handle:
-Run started UTC:
-Starting git commit:
+$RUN_ROOT/logs/operator_log.md
+$RUN_ROOT/logs/run_env.sh
+$RUN_ROOT/logs/protocol_lock.txt
+$RUN_ROOT/hashes/protocol_lock.sha256
+$RUN_ROOT/hashes/raw_payloads.sha256
+$RUN_ROOT/hashes/raw_payloads_manifest.sha256
+$RUN_ROOT/reports/station_coverage.csv
+$RUN_ROOT/reports/selected_sampling_points.csv
+$RUN_ROOT/reports/eea_aq_d001_manual_summary.json
 ```
 
-## 4. Create External Working Folders
-
-Raw files must stay outside the public repository.
-
-20. Choose a run date in `YYYYMMDD` format.
-21. Create a run root outside the repo. This command creates the folder tree
-    that will hold raw downloads, logs, hashes, scripts and reports.
-
-    ```bash
-    RUN_ID="eea_aq_d001_$(date -u +%Y%m%d)"
-    RUN_ROOT="$HOME/claimbound_runs/$RUN_ID"
-    mkdir -p "$RUN_ROOT"/{raw,downloads,hashes,logs,reports,scripts,work}
-    printf '%s\n' "$RUN_ROOT"
-    ```
-
-22. Create a reusable environment file. This file lets you restore variables if
-    the terminal is closed.
-
-    ```bash
-    cat > "$RUN_ROOT/logs/run_env.sh" <<EOF
-    export CLAIMBOUND_REPO="$CLAIMBOUND_REPO"
-    export RUN_ID="$RUN_ID"
-    export RUN_ROOT="$RUN_ROOT"
-    export STARTING_GIT_COMMIT="$STARTING_GIT_COMMIT"
-    export RUN_STARTED_UTC="$RUN_STARTED_UTC"
-    EOF
-    ```
-
-23. Print the environment file. Confirm that paths are correct.
-
-    ```bash
-    cat "$RUN_ROOT/logs/run_env.sh"
-    ```
-
-24. Confirm you are still inside the public repository before creating public
-    files.
-
-    ```bash
-    pwd
-    ```
-
-25. If `pwd` does not print the same path as `$CLAIMBOUND_REPO`, return to the
-    public repository.
-
-    ```bash
-    cd "$CLAIMBOUND_REPO"
-    ```
-
-26. Keep browser downloads in `$RUN_ROOT/downloads`.
-27. Move raw downloaded files into `$RUN_ROOT/raw`.
-28. Never commit files from `$RUN_ROOT/raw`.
-
-## 5. Create The Run Log
-
-29. Create the run log. This command writes the main log file at the exact path
-    `$RUN_ROOT/logs/operator_log.md`.
-
-    ```bash
-    cat > "$RUN_ROOT/logs/operator_log.md" <<'EOF'
-    # EEA AQ D-001 Operator Log
-
-    ## Run Identity
-
-    Track ID: EEA_AQ_D001
-    Operator:
-    Execution mode:
-    Run started UTC:
-    Starting git commit:
-    External run root:
-
-    ## Fixed Scope
-
-    Official source: EEA Air Quality Download Service
-    Dataset: verified E1a
-    Pollutant: PM10
-    Countries: NL, BE, DE
-    Period: 2018-01-01 through 2024-12-31
-    Aggregation: daily records
-    Coverage gate: at least 85 percent daily coverage per sampling point
-    Selection rule: first five eligible sampling points per country after sorting
-
-    ## Source Notes
-
-    Download page:
-    Web application:
-    API Swagger:
-    Documentation PDF:
-    Copyright/reuse note:
-
-    ## Download Notes
-
-    Browser used:
-    Download method: web application / API Swagger / other
-    Dataset selected:
-    Countries selected:
-    Pollutant selected:
-    Type selected:
-    Date start selected:
-    Date end selected:
-    Summary result:
-    Download files:
-
-    ## Processing Notes
-
-    Python version:
-    pandas version:
-    pyarrow version:
-    Input file count:
-    Raw hash manifest:
-    Analysis CSV:
-    Sanitized summary JSON:
-
-    ## Status Decision
-
-    Result status:
-    Reason:
-    Deviations:
-    Known limitations:
-    EOF
-    ```
-
-30. Append the values already collected by commands. Replace
-    `YOUR_PUBLIC_OPERATOR_NAME` before running the command.
-
-    ```bash
-    OPERATOR_NAME="YOUR_PUBLIC_OPERATOR_NAME"
-    EXECUTION_MODE="MANUAL_NO_AI"
-    {
-      printf '\n## Command-Filled Run Values\n\n'
-      printf 'Operator: %s\n' "$OPERATOR_NAME"
-      printf 'Execution mode: %s\n' "$EXECUTION_MODE"
-      printf 'Run started UTC: %s\n' "$RUN_STARTED_UTC"
-      printf 'Starting git commit: %s\n' "$STARTING_GIT_COMMIT"
-      printf 'External run root: %s\n' "$RUN_ROOT"
-      printf 'Public repository: %s\n' "$CLAIMBOUND_REPO"
-    } >> "$RUN_ROOT/logs/operator_log.md"
-    ```
-
-31. Open the run log and verify that the appended values are visible.
-
-    ```bash
-    open -e "$RUN_ROOT/logs/operator_log.md"
-    ```
-
-32. If `open -e` is unavailable, use this terminal editor command.
-
-    ```bash
-    nano "$RUN_ROOT/logs/operator_log.md"
-    ```
-
-33. Save the file.
-
-## 6. Freeze The Protocol
-
-34. Create a protocol lock file. This is the exact fixed protocol for the run.
-
-    ```bash
-    cat > "$RUN_ROOT/logs/protocol_lock.txt" <<'EOF'
-    Track ID: EEA_AQ_D001
-    Claim type: source audit
-    Official source: EEA Air Quality Download Service
-    Dataset: verified E1a data
-    Pollutant: PM10
-    Countries: NL, BE, DE
-    Period: 2018-01-01 through 2024-12-31
-    Aggregation: daily records
-    Coverage gate: at least 85 percent daily coverage per sampling point
-    Selection rule: first five eligible sampling points per country after sorting by country code, city/locality if available, and sampling point ID
-    Raw payload policy: raw files stay outside this repository
-    Public output policy: commit only sanitized summary, evidence card, and card SVG
-    Execution mode: MANUAL_NO_AI
-    EOF
-    ```
-
-35. Hash the protocol lock. This proves which protocol text was frozen before
-    source or outcome inspection.
-
-    ```bash
-    shasum -a 256 "$RUN_ROOT/logs/protocol_lock.txt" > "$RUN_ROOT/hashes/protocol_lock.sha256"
-    cat "$RUN_ROOT/hashes/protocol_lock.sha256"
-    ```
-
-36. Append the protocol-lock hash to the operator log.
-
-    ```bash
-    {
-      printf '\n## Protocol Lock\n\n'
-      printf 'Protocol lock file: %s\n' "$RUN_ROOT/logs/protocol_lock.txt"
-      printf 'Protocol lock SHA-256: '
-      awk '{print $1}' "$RUN_ROOT/hashes/protocol_lock.sha256"
-    } >> "$RUN_ROOT/logs/operator_log.md"
-    ```
-
-## 7. Manual Source-Rights Audit
-
-37. Open the EEA AQ Portal download page in a browser.
-38. Confirm that it links to the Air Quality Download service.
-39. Open the Air Quality Download web application.
-40. Open the documentation PDF.
-41. Open the EEA copyright notice.
-42. Open the EEA reuse FAQ.
-43. Read the pages manually.
-44. Append the exact official source links to the operator log.
-
-    ```bash
-    {
-      printf '\n## Official Source Links Checked\n\n'
-      printf 'Download page: %s\n' 'https://aqportal.discomap.eea.europa.eu/download-data/'
-      printf 'Web application: %s\n' 'https://eeadmz1-downloads-webapp.azurewebsites.net/'
-      printf 'API Swagger: %s\n' 'https://eeadmz1-downloads-api-appservice.azurewebsites.net/swagger/index.html'
-      printf 'Documentation PDF: %s\n' 'https://eeadmz1-downloads-webapp.azurewebsites.net/content/documentation/How_To_Downloads.pdf'
-      printf 'Copyright notice: %s\n' 'https://www.eea.europa.eu/en/about/policy/copyright'
-      printf 'Reuse FAQ: %s\n' 'https://www.eea.europa.eu/en/about/contact-us/faqs/can-i-use-eea-content-in-my-work-or-in-my-organisations-products'
-    } >> "$RUN_ROOT/logs/operator_log.md"
-    ```
-
-45. Append the source-rights decision. Replace the placeholder text before
-    running the command.
-
-    ```bash
-    SOURCE_RIGHTS_DECISION="REPLACE_WITH_ALLOWED_OR_BLOCKED_AND_REASON"
-    {
-      printf '\n## Source Rights Decision\n\n'
-      printf 'Sanitized public summaries allowed: %s\n' "$SOURCE_RIGHTS_DECISION"
-      printf 'Raw payload files committed: no\n'
-      printf 'Raw payload policy: raw files remain under %s/raw\n' "$RUN_ROOT"
-    } >> "$RUN_ROOT/logs/operator_log.md"
-    ```
-
-46. If reuse terms are unavailable, ambiguous, or contradictory, stop.
-47. If blocked by rights uncertainty, set candidate status to `BLOCKED_SOURCE`.
-48. If blocked, skip to section 19 and create a blocked summary.
-
-## 8. Download Method A: Web Application
-
-Use this method first. Use Method B only if the web UI fails or you need a
-repeatable API fallback.
-
-48. Open <https://eeadmz1-downloads-webapp.azurewebsites.net/>.
-49. Wait until the page is fully loaded.
-50. Find the country filter.
-51. Select `NL`.
-52. Select `BE`.
-53. Select `DE`.
-54. Find the pollutant filter.
-55. Select `PM10`.
-56. Find the dataset filter.
-57. Select verified E1a data.
-58. Find the type or aggregation filter.
-59. Select daily records.
-60. Find temporal coverage.
-61. Set start to `2018-01-01T00:00:00Z` if the UI accepts time.
-62. If the UI accepts only dates, set start to `2018-01-01`.
-63. Set end to `2024-12-31T23:59:59Z` if the UI accepts time.
-64. If the UI accepts only dates, set end to `2024-12-31`.
-65. Leave city blank.
-66. Leave email blank unless you want to provide one.
-67. If there is a `Summary` button, click it before downloading.
-68. Copy the summary count and size into `operator_log.md` with this command.
-    Replace the placeholder values with what the web application shows.
-
-    ```bash
-    WEBAPP_SUMMARY_COUNT="REPLACE_WITH_UI_COUNT"
-    WEBAPP_SUMMARY_SIZE="REPLACE_WITH_UI_SIZE"
-    {
-      printf '\n## Web Application Summary\n\n'
-      printf 'Summary count: %s\n' "$WEBAPP_SUMMARY_COUNT"
-      printf 'Summary size: %s\n' "$WEBAPP_SUMMARY_SIZE"
-    } >> "$RUN_ROOT/logs/operator_log.md"
-    ```
-
-69. If the UI says the request is too large, select the option for list of URLs.
-70. If the UI offers parquet download directly and size is acceptable, keep it.
-71. Click `Download`.
-72. Wait until the browser finishes downloading.
-73. If a ZIP is downloaded to your default `Downloads` folder, move it into
-    `$RUN_ROOT/raw`. Replace the filename before running this command.
-
-    ```bash
-    mv "$HOME/Downloads/REPLACE_WITH_DOWNLOADED_FILE.zip" "$RUN_ROOT/raw/"
-    ```
-
-74. If a CSV list of URLs is downloaded, move it into `$RUN_ROOT/downloads`.
-    Replace the filename before running this command.
-
-    ```bash
-    mv "$HOME/Downloads/REPLACE_WITH_DOWNLOADED_URL_LIST.csv" "$RUN_ROOT/downloads/"
-    ```
-
-75. If the browser downloads multiple parquet files, move them into
-    `$RUN_ROOT/raw`. Replace the pattern if the downloaded filenames are
-    different.
-
-    ```bash
-    mv "$HOME"/Downloads/*.parquet "$RUN_ROOT/raw/"
-    ```
-
-76. Record every downloaded filename in `operator_log.md`.
-
-    ```bash
-    {
-      printf '\n## Downloaded Files Stored Outside Repository\n\n'
-      printf 'Raw folder: %s/raw\n' "$RUN_ROOT"
-      find "$RUN_ROOT/raw" -maxdepth 1 -type f -print | sort
-      printf '\nDownload helper folder: %s/downloads\n' "$RUN_ROOT"
-      find "$RUN_ROOT/downloads" -maxdepth 1 -type f -print | sort
-    } >> "$RUN_ROOT/logs/operator_log.md"
-    ```
-
-77. If nothing downloads after two attempts, do not keep clicking randomly.
-78. Switch to Method B.
-
-## 9. Download Method B: API Swagger Fallback
-
-79. Open the API Swagger page.
-80. Find the endpoint group for parquet files.
-81. Prefer the endpoint that returns a list of parquet URLs.
-82. Click `Try it out`.
-83. Use country values `NL`, `BE`, `DE`.
-84. Use pollutant value `PM10`.
-85. Use dataset value `2` for verified E1a data.
-86. Use source value `API`.
-87. Use start `2018-01-01T00:00:00Z` if the endpoint accepts it.
-88. Use end `2024-12-31T23:59:59Z` if the endpoint accepts it.
-89. Use daily type if the endpoint exposes a type or frequency field.
-90. Click `Execute`.
-91. Copy the request URL or request body into `operator_log.md`. Replace the
-    placeholder before running the command.
-
-    ```bash
-    API_REQUEST_USED="REPLACE_WITH_SWAGGER_REQUEST_URL_OR_BODY"
-    printf '\nAPI request used: %s\n' "$API_REQUEST_USED" >> "$RUN_ROOT/logs/operator_log.md"
-    ```
-
-92. Copy the HTTP status code into `operator_log.md`. Replace the placeholder
-    before running the command.
-
-    ```bash
-    API_HTTP_STATUS="REPLACE_WITH_HTTP_STATUS"
-    printf 'API HTTP status: %s\n' "$API_HTTP_STATUS" >> "$RUN_ROOT/logs/operator_log.md"
-    ```
-
-93. If the endpoint returns URLs, copy them into a local text file:
-
-    ```bash
-    touch "$RUN_ROOT/downloads/parquet_urls.txt"
-    open -e "$RUN_ROOT/downloads/parquet_urls.txt"
-    ```
-
-94. Paste one URL per line into `parquet_urls.txt`, save the file, then verify
-    the saved URL count.
-
-    ```bash
-    wc -l "$RUN_ROOT/downloads/parquet_urls.txt"
-    ```
-
-95. Download the URL list.
-
-    ```bash
-    cd "$RUN_ROOT/raw"
-    while IFS= read -r url; do
-      [ -z "$url" ] && continue
-      filename="$(basename "${url%%\?*}")"
-      curl -L --fail --retry 3 --output "$filename" "$url"
-    done < "$RUN_ROOT/downloads/parquet_urls.txt"
-    ```
-
-96. If the API returns a ZIP URL, download the ZIP into `$RUN_ROOT/raw`.
-    Replace the placeholder URL before running the command.
-
-    ```bash
-    curl -L --fail --retry 3 --output "$RUN_ROOT/raw/eea_aq_d001_api_payload.zip" "REPLACE_WITH_ZIP_URL"
-    ```
-
-97. If the API returns an error, record the response. Replace the placeholder
-    text before running the command.
-
-    ```bash
-    API_ERROR_RESPONSE="REPLACE_WITH_API_ERROR_TEXT"
-    printf 'API error response: %s\n' "$API_ERROR_RESPONSE" >> "$RUN_ROOT/logs/operator_log.md"
-    ```
-
-98. If both Method A and Method B fail, set candidate status to `BLOCKED_SOURCE`.
-
-## 10. Freeze The Raw Payload Set
-
-99. List raw files.
-
-    ```bash
-    find "$RUN_ROOT/raw" -type f | sort
-    ```
-
-100. If there are ZIP files, keep the original ZIP.
-101. Extract a copy into a subfolder.
-
-     ```bash
-     mkdir -p "$RUN_ROOT/work/extracted"
-     find "$RUN_ROOT/raw" -name '*.zip' -print0 | while IFS= read -r -d '' z; do
-       unzip -n "$z" -d "$RUN_ROOT/work/extracted"
-     done
-     ```
-
-102. Hash the raw files.
-
-     ```bash
-     cd "$RUN_ROOT"
-     find raw work/extracted -type f | sort | xargs shasum -a 256 > hashes/raw_payloads.sha256
-     ```
-
-103. Hash the hash manifest.
-
-     ```bash
-     shasum -a 256 "$RUN_ROOT/hashes/raw_payloads.sha256" > "$RUN_ROOT/hashes/raw_payloads_manifest.sha256"
-     ```
-
-104. Copy the manifest hash into `operator_log.md`.
-105. Do not copy raw hashes into public docs unless needed as an external
-     manifest reference.
-106. Do not copy raw payloads into the public repository.
-
-## 11. Prepare Local Processing Environment
-
-107. Create a local virtual environment outside the repo.
-
-     ```bash
-     cd "$RUN_ROOT"
-     python3 -m venv .venv
-     . .venv/bin/activate
-     python -m pip install --upgrade pip
-     python -m pip install pandas pyarrow
-     ```
-
-108. Record versions.
-
-     ```bash
-     python - <<'PY'
-     import pandas as pd
-     import pyarrow as pa
-     import sys
-     print("python", sys.version)
-     print("pandas", pd.__version__)
-     print("pyarrow", pa.__version__)
-     PY
-     ```
-
-109. Copy those versions into `operator_log.md`.
-
-## 12. Create The Inspection Script
-
-110. Create the script.
-
-     ```bash
-     cat > "$RUN_ROOT/scripts/inspect_eea_aq_d001.py" <<'PY'
-     from __future__ import annotations
-
-     import json
-     import zipfile
-     from datetime import date
-     from pathlib import Path
-
-     import pandas as pd
-
-     RUN_ROOT = Path(__file__).resolve().parents[1]
-     INPUT_DIRS = [RUN_ROOT / "raw", RUN_ROOT / "work" / "extracted"]
-     OUT_DIR = RUN_ROOT / "reports"
-     OUT_DIR.mkdir(parents=True, exist_ok=True)
-
-     START = pd.Timestamp("2018-01-01")
-     END = pd.Timestamp("2024-12-31")
-     EXPECTED_DAYS = (END - START).days + 1
-     MIN_COVERAGE = 0.85
-     COUNTRIES = {"NL", "BE", "DE"}
-
-     def norm(name: object) -> str:
-         return str(name).strip().lower().replace(" ", "").replace("_", "")
-
-     def find_col(cols: list[str], candidates: list[str]) -> str | None:
-         lookup = {norm(c): c for c in cols}
-         for c in candidates:
-             if norm(c) in lookup:
-                 return lookup[norm(c)]
-         for col in cols:
-             n = norm(col)
-             if any(norm(c) in n for c in candidates):
-                 return col
-         return None
-
-     def files() -> list[Path]:
-         out: list[Path] = []
-         for root in INPUT_DIRS:
-             if not root.exists():
-                 continue
-             for path in root.rglob("*"):
-                 if path.is_file() and path.suffix.lower() in {".parquet", ".csv"}:
-                     out.append(path)
-         return sorted(out)
-
-     def read(path: Path) -> pd.DataFrame:
-         if path.suffix.lower() == ".parquet":
-             return pd.read_parquet(path)
-         return pd.read_csv(path)
-
-     frames = []
-     file_summaries = []
-     for path in files():
-         try:
-             df = read(path)
-         except Exception as exc:
-             file_summaries.append({"path": str(path), "read_error": repr(exc)})
-             continue
-
-         cols = list(df.columns)
-         sampling_col = find_col(cols, ["Samplingpoint", "SamplingPoint", "samplingpoint"])
-         pollutant_col = find_col(cols, ["Pollutant", "pollutant"])
-         start_col = find_col(cols, ["Start", "DatetimeBegin", "begin"])
-         end_col = find_col(cols, ["End", "DatetimeEnd", "end"])
-         value_col = find_col(cols, ["Value", "Concentration", "value"])
-         unit_col = find_col(cols, ["Unit", "unit"])
-         agg_col = find_col(cols, ["AggType", "aggregationtype", "type"])
-         country_col = find_col(cols, ["Country", "countrycode", "CountryCode"])
-         city_col = find_col(cols, ["City", "Locality", "locality"])
-
-         file_summaries.append(
-             {
-                 "path": str(path),
-                 "rows": int(len(df)),
-                 "columns": cols,
-                 "sampling_col": sampling_col,
-                 "pollutant_col": pollutant_col,
-                 "start_col": start_col,
-                 "value_col": value_col,
-                 "agg_col": agg_col,
-             }
-         )
-
-         required = [sampling_col, pollutant_col, start_col, value_col]
-         if any(c is None for c in required):
-             continue
-
-         small = pd.DataFrame()
-         small["samplingpoint"] = df[sampling_col].astype(str)
-         small["pollutant"] = df[pollutant_col].astype(str)
-         small["start"] = pd.to_datetime(df[start_col], errors="coerce", utc=False)
-         small["value"] = pd.to_numeric(df[value_col], errors="coerce")
-         small["unit"] = df[unit_col].astype(str) if unit_col else ""
-         small["aggtype"] = df[agg_col].astype(str) if agg_col else ""
-         if country_col:
-             small["country"] = df[country_col].astype(str).str.upper().str[:2]
-         else:
-             small["country"] = small["samplingpoint"].str.upper().str[:2]
-         if city_col:
-             small["city"] = df[city_col].astype(str)
-         else:
-             small["city"] = ""
-         frames.append(small)
-
-     if frames:
-         data = pd.concat(frames, ignore_index=True)
-     else:
-         data = pd.DataFrame(
-             columns=["samplingpoint", "pollutant", "start", "value", "unit", "aggtype", "country", "city"]
-         )
-
-     filtered = data[
-         data["country"].isin(COUNTRIES)
-         & data["pollutant"].str.upper().str.contains("PM10", na=False)
-         & (data["start"] >= START)
-         & (data["start"] <= END)
-         & data["value"].notna()
-     ].copy()
-
-     if not filtered.empty and filtered["aggtype"].astype(str).str.len().sum() > 0:
-         daily_mask = filtered["aggtype"].str.lower().str.contains("day|daily", na=False)
-         if daily_mask.any():
-             filtered = filtered[daily_mask].copy()
-
-     filtered["date"] = filtered["start"].dt.date
-     grouped = (
-         filtered.groupby(["country", "city", "samplingpoint"], dropna=False)
-         .agg(
-             observed_days=("date", "nunique"),
-             row_count=("value", "size"),
-             first_date=("date", "min"),
-             last_date=("date", "max"),
-             unit_values=("unit", lambda x: sorted({str(v) for v in x if str(v) != ""})[:5]),
-         )
-         .reset_index()
-     )
-     grouped["expected_days"] = EXPECTED_DAYS
-     grouped["coverage_ratio"] = grouped["observed_days"] / EXPECTED_DAYS
-     grouped["eligible"] = grouped["coverage_ratio"] >= MIN_COVERAGE
-     grouped = grouped.sort_values(["country", "city", "samplingpoint"], kind="stable")
-     selected = grouped[grouped["eligible"]].groupby("country", group_keys=False).head(5)
-
-     by_country = {}
-     for country in sorted(COUNTRIES):
-         country_rows = grouped[grouped["country"] == country]
-         selected_rows = selected[selected["country"] == country]
-         by_country[country] = {
-             "sampling_points_seen": int(country_rows["samplingpoint"].nunique()) if not country_rows.empty else 0,
-             "eligible_sampling_points": int(country_rows[country_rows["eligible"]]["samplingpoint"].nunique()) if not country_rows.empty else 0,
-             "selected_sampling_points": selected_rows["samplingpoint"].tolist(),
-             "gate_passed": bool(len(selected_rows) >= 5),
-         }
-
-     overall_passed = all(v["gate_passed"] for v in by_country.values())
-     if filtered.empty:
-         status = "BLOCKED_SOURCE"
-         reason = "No usable PM10 daily records were parsed from the downloaded files."
-     elif overall_passed:
-         status = "PASSED_UNDER_PROTOCOL"
-         reason = "All fixed countries have at least five eligible PM10 daily sampling points."
-     else:
-         status = "INSUFFICIENT_COVERAGE"
-         reason = "At least one fixed country has fewer than five eligible PM10 daily sampling points."
-
-     grouped.to_csv(OUT_DIR / "station_coverage.csv", index=False)
-     selected.to_csv(OUT_DIR / "selected_sampling_points.csv", index=False)
-     summary = {
-         "schema": "claimbound_eea_aq_d001_manual_summary_v1",
-         "track_id": "EEA_AQ_D001",
-         "source": {
-             "name": "EEA Air Quality Download Service",
-             "web_application": "https://eeadmz1-downloads-webapp.azurewebsites.net/",
-             "api_swagger": "https://eeadmz1-downloads-api-appservice.azurewebsites.net/swagger/index.html",
-             "raw_payload_committed": False,
-         },
-         "fixed_scope": {
-             "dataset": "verified E1a",
-             "pollutant": "PM10",
-             "countries": sorted(COUNTRIES),
-             "period": "2018-01-01..2024-12-31",
-             "aggregation": "daily records",
-             "coverage_gate": "at least 85 percent daily coverage per sampling point",
-             "selection_rule": "first five eligible sampling points per country after sorting",
-         },
-         "file_summaries": file_summaries,
-         "by_country": by_country,
-         "result": {
-             "result_status": status,
-             "reason": reason,
-         },
-         "claim_boundary": {
-             "allowed": "EEA AQ D-001 source-readiness status under the fixed PM10 coverage protocol only.",
-             "forbidden": [
-                 "air-quality forecasting performance",
-                 "deployment readiness",
-                 "model superiority",
-                 "health-impact claim",
-                 "raw payload redistribution",
-             ],
-         },
-     }
-     (OUT_DIR / "eea_aq_d001_manual_summary.json").write_text(
-         json.dumps(summary, indent=2, sort_keys=True),
-         encoding="utf-8",
-     )
-     print(json.dumps(summary["result"], indent=2, sort_keys=True))
-     PY
-     ```
-
-111. Save the script.
-112. Do not edit the script after seeing the result unless the script fails to
-     read the documented source format.
-113. If you edit the script, record the reason in `operator_log.md`.
-
-## 13. Run The Inspection Script
-
-114. Run it.
-
-     ```bash
-     cd "$RUN_ROOT"
-     . .venv/bin/activate
-     python scripts/inspect_eea_aq_d001.py
-     ```
-
-115. If the script prints `PASSED_UNDER_PROTOCOL`, do not celebrate yet.
-116. Open the generated station coverage file.
-
-     ```bash
-     open "$RUN_ROOT/reports/station_coverage.csv"
-     ```
-
-117. If `open` is unavailable, print the first rows.
-
-     ```bash
-     python - <<'PY'
-     import pandas as pd, os
-     root = os.environ["RUN_ROOT"]
-     print(pd.read_csv(f"{root}/reports/station_coverage.csv").head(30).to_string())
-     PY
-     ```
-
-118. Check that countries are only `BE`, `DE`, `NL`.
-119. Check that sampling points are not blank.
-120. Check that coverage ratios are plausible.
-121. Check that selected sampling points are sorted by the fixed rule.
-122. Open the selected sampling points file.
-
-     ```bash
-     open "$RUN_ROOT/reports/selected_sampling_points.csv"
-     ```
-
-123. Confirm that each passing country has exactly five selected sampling
-     points.
-124. If any file has unreadable columns, inspect `file_summaries` in the JSON.
-125. If the downloaded source format cannot be parsed without changing the
-     protocol, choose `BLOCKED_SOURCE`.
-
-## 14. Manual Result Decision
-
-126. Open the generated summary JSON.
-
-     ```bash
-     python3 -m json.tool "$RUN_ROOT/reports/eea_aq_d001_manual_summary.json" | less
-     ```
-
-127. Read `result.result_status`.
-128. Read `result.reason`.
-129. Read `by_country`.
-130. Do not override the status because it is disappointing.
-131. Do not change country list.
-132. Do not change pollutant.
-133. Do not lower coverage after seeing the output.
-134. Do not select different stations after seeing coverage.
-135. If source access failed, status must be `BLOCKED_SOURCE`.
-136. If rights were unclear, status must be `BLOCKED_SOURCE`.
-137. If the parser could read data but coverage failed, status should be
-     `INSUFFICIENT_COVERAGE`.
-138. If all gates passed, status may be `PASSED_UNDER_PROTOCOL`.
-139. Write the final status into `operator_log.md`.
-140. Write the reason into `operator_log.md`.
-141. Write any deviations into `operator_log.md`.
-
-## 15. Create Public Sanitized Summary
-
-142. Go to the public repository.
-
-     ```bash
-     cd /path/to/claimbound-public-benchmarks
-     ```
-
-143. Create a new branch.
-
-     ```bash
-     git switch -c manual/eea-aq-d001-result
-     ```
-
-144. Copy only the sanitized summary JSON into `artifacts/`.
-
-     ```bash
-     cp "$RUN_ROOT/reports/eea_aq_d001_manual_summary.json" artifacts/eea_aq_d001_manual_summary.json
-     ```
-
-145. Do not copy raw parquet files.
-146. Do not copy raw CSV files.
-147. Do not copy ZIP files.
-148. Do not copy browser screenshots.
-149. Hash the sanitized summary.
-
-     ```bash
-     shasum -a 256 artifacts/eea_aq_d001_manual_summary.json
-     ```
-
-150. Copy this hash into `operator_log.md`.
-
-## 16. Create The Evidence Card JSON
-
-151. Choose the current date in `YYYY-MM-DD` format.
-152. Set `CARD_DATE` to that date.
-
-     ```bash
-     CARD_DATE="$(date -u +%Y-%m-%d)"
-     CARD_PATH="docs/evidence_cards/CLAIMBOUND-EEA-AQ-D001-${CARD_DATE}.json"
-     ```
-
-153. Create the evidence card.
-
-     ```bash
-     SUMMARY_SHA="$(shasum -a 256 artifacts/eea_aq_d001_manual_summary.json | awk '{print $1}')"
-     RAW_MANIFEST_SHA="$(awk '{print $1}' "$RUN_ROOT/hashes/raw_payloads_manifest.sha256")"
-     STATUS="$(python3 - <<'PY'
-     import json
-     data=json.load(open("artifacts/eea_aq_d001_manual_summary.json"))
-     print(data["result"]["result_status"])
-     PY
-     )"
-     cat > "$CARD_PATH" <<EOF
-     {
-       "access_date": "$CARD_DATE",
-       "ai_assistance": "not used during manual status decision",
-       "baseline_control_summary": "Fixed source-readiness controls: official source, verified E1a dataset, PM10 pollutant, BE/DE/NL country set, daily aggregation, 2018-2024 period, 85 percent coverage gate, first five eligible sampling points per country.",
-       "card_svg_template": "docs/assets/claimbound_evidence_card.svg",
-       "claim_boundary": "EEA AQ D-001 reports only source-readiness and coverage status under the fixed PM10 manual protocol.",
-       "claim_type": "source audit",
-       "created_at": "$CARD_DATE",
-       "domain": "air-quality",
-       "evidence_id": "CLAIMBOUND-EEA-AQ-D001-$CARD_DATE",
-       "evidence_url": "https://github.com/NeoZorK/claimbound-public-benchmarks/blob/main/$CARD_PATH",
-       "execution_mode": "MANUAL_NO_AI",
-       "git_commit": "$(git rev-parse --short HEAD)",
-       "known_limitations": [
-         "This is a source-readiness and coverage audit only.",
-         "No forecasting performance is claimed.",
-         "No deployment readiness is claimed.",
-         "No raw payloads are committed."
-       ],
-       "manual_review": "operator reviewed source access, source rights, raw payload boundary, station selection and final status",
-       "official_source_name": "EEA Air Quality Download Service",
-       "official_source_url": "https://eeadmz1-downloads-webapp.azurewebsites.net/",
-       "operator": "fill operator name or handle",
-       "protocol_id": "EEA_AQ_D001",
-       "protocol_version": "manual-track-v1",
-       "raw_payload_committed": false,
-       "raw_payload_manifest": "external raw payload manifest SHA-256: $RAW_MANIFEST_SHA",
-       "reproduction_level": "not independently reproduced",
-       "result_status": "$STATUS",
-       "runner_command": "manual runbook docs/manual_audit/EEA_AQ_D001_MANUAL_TRACK.md plus local external inspection script",
-       "sanitized_report_path": "artifacts/eea_aq_d001_manual_summary.json",
-       "sanitized_report_sha256": "$SUMMARY_SHA",
-       "source_rights_note": "Official public EEA source; raw payloads are not committed."
-     }
-     EOF
-     ```
-
-154. Open the card.
-
-     ```bash
-     python3 -m json.tool "$CARD_PATH" | less
-     ```
-
-155. Replace `operator` with your actual public operator name or handle.
-156. If AI was used, change `execution_mode` and `ai_assistance` honestly.
-157. If status is not `PASSED_UNDER_PROTOCOL`, keep
-     `baseline_control_summary`; it explains the source-audit controls.
-158. Validate the card.
-
-     ```bash
-     uv run --extra dev python scripts/claimbound_validate_evidence_card.py "$CARD_PATH"
-     ```
-
-159. Fix only validation errors.
-160. Do not change the result status to make the validator pass.
-
-## 17. Create The Visual SVG Card
-
-161. Copy the SVG template.
-
-     ```bash
-     SVG_PATH="${CARD_PATH%.json}.svg"
-     cp docs/assets/claimbound_evidence_card.svg "$SVG_PATH"
-     ```
-
-162. Replace placeholders manually in the SVG.
-163. Use the evidence card JSON as the source of truth.
-164. Suggested replacements:
-
-     ```text
-     {{status_exact}} -> the result_status value
-     {{reproduction_level}} -> not reproduced, outcome reproduced, or exact level
-     {{allowed_claim_sentence}} -> EEA AQ D-001 source-readiness status recorded
-     {{record_id}} -> EEA-AQ-D001
-     {{protocol_id}} -> EEA_AQ_D001 manual-track-v1
-     {{target_definition}} -> PM10 daily source coverage
-     {{candidate_definition}} -> official EEA E1a records
-     {{controls_and_gate}} -> 85 percent coverage, 5 stations per country
-     {{source_name}} -> EEA Air Quality Download Service
-     {{period_scope}} -> 2018-2024, BE/DE/NL
-     {{evidence_date}} -> CARD_DATE
-     {{artifact_ref}} -> short commit plus sanitized summary
-     {{evidence_url}} -> CARD_PATH
-     ```
-
-165. Search for leftover placeholders.
-
-     ```bash
-     rg "\\{\\{" "$SVG_PATH"
-     ```
-
-166. If placeholders remain, fill them.
-167. Open the SVG in a browser.
-168. Confirm the card text is readable.
-169. Confirm the status matches the JSON card.
-170. Confirm there is no broader claim than the JSON card.
-
-## 18. Update The Registry Index
-
-171. Open `docs/registry/evidence_index.json`.
-172. Add a new entry for the EEA card under `cards`.
-173. Use the JSON card path.
-174. Add the SVG URL.
-175. Add the result status.
-176. Add domain `air-quality`.
-177. Add source `EEA Air Quality Download Service`.
-178. Add reproduction level.
-179. Increment `card_count`.
-180. Increment `statistics.by_result_status`.
-181. Increment `statistics.by_domain.air-quality`.
-182. Increment `statistics.by_source.EEA Air Quality Download Service`.
-183. Save the file.
-184. Validate JSON formatting.
-
-     ```bash
-     python3 -m json.tool docs/registry/evidence_index.json >/tmp/claimbound_registry_check.json
-     ```
-
-## 19. If The Track Is Blocked
-
-185. Do not delete the failed notes.
-186. Create a sanitized blocked summary JSON.
-187. Use `BLOCKED_SOURCE`.
-188. Explain exactly what blocked the run.
-189. Do not include private browser tokens.
-190. Do not include raw payloads.
-191. Create an evidence card anyway.
-192. Include `block_reason` in the evidence card.
-193. Validate the card.
-194. A blocked card is a valid ClaimBound result.
-
-## 20. Final Local Checks
-
-195. Run tests.
-
-     ```bash
-     uv run --extra dev python -m pytest -n auto
-     ```
-
-196. Scan for raw payload-like files.
-
-     ```bash
-     find . \( -path ./.git -o -path ./.venv -o -path ./.pytest_cache -o -path ./__pycache__ \) -prune -o -type f \( -name '*.csv' -o -name '*.parquet' -o -name '*.zip' -o -name '*.jsonl' -o -name '*.env' -o -name '*.key' -o -name '*.pem' \) -print
-     ```
-
-197. The command should not print raw payload files.
-198. If it prints your raw payload files, remove them before committing.
-199. Scan for forbidden broad claims.
-
-     ```bash
-     rg -n -i "universal forecasting edge|deployment readiness|best model|model superiority|breakthrough" artifacts docs
-     ```
-
-200. If matches are in forbidden contexts, rewrite the public claim boundary.
-201. Validate the evidence card again.
-202. Check git status.
-
-     ```bash
-     git status --short
-     ```
-
-203. Confirm only intended public files changed.
-
-## 21. Commit And Pull Request
-
-204. Stage the sanitized public files.
-
-     ```bash
-     git add artifacts/eea_aq_d001_manual_summary.json
-     git add docs/evidence_cards/CLAIMBOUND-EEA-AQ-D001-*.json
-     git add docs/evidence_cards/CLAIMBOUND-EEA-AQ-D001-*.svg
-     git add docs/registry/evidence_index.json
-     ```
-
-205. Do not stage `$RUN_ROOT`.
-206. Do not stage raw files.
-207. Commit.
-
-     ```bash
-     git commit -m "docs: add EEA AQ D-001 manual evidence card"
-     ```
-
-208. Push the branch.
-
-     ```bash
-     git push -u origin manual/eea-aq-d001-result
-     ```
-
-209. Open a pull request.
-210. In the pull request body, include:
-
-     ```text
-     Summary:
-     - ran EEA AQ D-001 manual source-readiness track
-     - added sanitized summary
-     - added evidence card JSON/SVG
-     - updated public registry index
-
-     Verification:
-     - evidence-card validator passed
-     - pytest passed
-     - raw payload scan clean
-
-     Raw payload policy:
-     - raw files stored outside repository
-     - raw payload manifest hash recorded externally
-     ```
-
-211. Wait for GitHub checks.
-212. If checks fail, inspect logs.
-213. Fix only the real issue.
-214. Do not change the result status just to pass checks.
-215. Merge only after checks pass.
-
-## 22. Final Review Questions
-
-Before merging, answer these questions:
-
-216. Did the protocol stay fixed from the beginning?
-217. Did raw payloads stay outside the repository?
-218. Did the source rights note stay honest?
-219. Did the selected stations follow the sorting rule?
-220. Did coverage use the fixed 85 percent threshold?
-221. Does the public summary avoid raw payload details?
-222. Does the evidence card validate?
-223. Does the SVG match the JSON card?
-224. Does the registry index point to the right card?
-225. Does the final claim stay inside source-readiness and coverage only?
-226. Would another operator understand how to rerun this track?
-227. If the result is negative or blocked, is it recorded without shame?
-228. If the result passed, are the limitations still visible?
-
-## 23. What To Share
-
-Share these public links after merge:
-
-- the sanitized summary JSON;
-- the evidence card JSON;
-- the visual SVG card;
-- the registry index entry;
-- the pull request.
+Only this file may be copied into the repository after review:
+
+```text
+$RUN_ROOT/reports/eea_aq_d001_manual_summary.json
+```
+
+- [ ] I know which files are local-only.
+- [ ] I know which summary file may become public after review.
+
+---
+
+## 3. Start Run And Freeze Protocol
+
+Run from the public repository root.
+
+```bash
+set -euo pipefail
+
+CLAIMBOUND_REPO="$(pwd -P)"
+git status --short --branch
+
+STARTING_GIT_COMMIT="$(git rev-parse --short HEAD)"
+RUN_STARTED_UTC="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+RUN_ID="eea_aq_d001_$(date -u +%Y%m%d_%H%M%S)"
+RUN_ROOT="$HOME/claimbound_runs/$RUN_ID"
+OPERATOR_NAME="YOUR_PUBLIC_OPERATOR_NAME"
+EXECUTION_MODE="MANUAL_NO_AI"
+
+mkdir -p "$RUN_ROOT"/{raw,downloads,hashes,logs,reports,scripts,work}
+
+cat > "$RUN_ROOT/logs/run_env.sh" <<EOF
+export CLAIMBOUND_REPO="$CLAIMBOUND_REPO"
+export RUN_ID="$RUN_ID"
+export RUN_ROOT="$RUN_ROOT"
+export STARTING_GIT_COMMIT="$STARTING_GIT_COMMIT"
+export RUN_STARTED_UTC="$RUN_STARTED_UTC"
+export OPERATOR_NAME="$OPERATOR_NAME"
+export EXECUTION_MODE="$EXECUTION_MODE"
+EOF
+
+cat > "$RUN_ROOT/logs/protocol_lock.txt" <<EOF
+Track ID: EEA_AQ_D001
+Claim type: source audit
+Official source: EEA Air Quality Download Service
+Dataset: verified E1a data
+Pollutant: PM10
+Countries: NL, BE, DE
+Period: 2018-01-01 through 2024-12-31
+Aggregation: daily records
+Coverage gate: at least 85 percent daily coverage per sampling point
+Selection rule: first five eligible sampling points per country after sorting by country code, city/locality if available, and sampling point ID
+Raw payload policy: raw files stay outside this repository
+Public output policy: commit only sanitized summary, evidence card JSON, evidence card SVG, and registry update
+Execution mode: $EXECUTION_MODE
+EOF
+
+shasum -a 256 "$RUN_ROOT/logs/protocol_lock.txt" > "$RUN_ROOT/hashes/protocol_lock.sha256"
+
+cat > "$RUN_ROOT/logs/operator_log.md" <<EOF
+# EEA AQ D-001 Operator Log
+
+## Run Identity
+Track ID: EEA_AQ_D001
+Operator: $OPERATOR_NAME
+Execution mode: $EXECUTION_MODE
+Run started UTC: $RUN_STARTED_UTC
+Starting git commit: $STARTING_GIT_COMMIT
+Public repository: $CLAIMBOUND_REPO
+External run root: $RUN_ROOT
+
+## Protocol Lock
+Protocol lock file: $RUN_ROOT/logs/protocol_lock.txt
+Protocol lock SHA-256: $(awk '{print $1}' "$RUN_ROOT/hashes/protocol_lock.sha256")
+
+## Source Rights Decision
+Sanitized public summaries allowed: NOT_RECORDED_YET
+Raw payload files committed: no
+
+## Download Notes
+Download method: NOT_RECORDED_YET
+Summary count: NOT_RECORDED_YET
+Summary size: NOT_RECORDED_YET
+Downloaded files: NOT_RECORDED_YET
+
+## Processing Notes
+Runtime versions: NOT_RECORDED_YET
+Raw payload manifest SHA-256: NOT_RECORDED_YET
+Sanitized summary SHA-256: NOT_RECORDED_YET
+
+## Status Decision
+Result status: NOT_RECORDED_YET
+Reason: NOT_RECORDED_YET
+Deviations: none recorded yet
+Known limitations: source-readiness and coverage audit only; no forecasting claim
+EOF
+
+printf 'Run root: %s\n' "$RUN_ROOT"
+printf 'Reload later with: source "%s/logs/run_env.sh"\n' "$RUN_ROOT"
+```
+
+Check:
+
+```bash
+source "$RUN_ROOT/logs/run_env.sh"
+cat "$RUN_ROOT/hashes/protocol_lock.sha256"
+test -f "$RUN_ROOT/logs/operator_log.md" && echo OK
+```
+
+- [ ] Repository status checked before run.
+- [ ] `$RUN_ROOT` created outside repository.
+- [ ] `operator_log.md` created.
+- [ ] `protocol_lock.txt` created.
+- [ ] `protocol_lock.sha256` created before data inspection.
+
+---
+
+## 4. Source And Rights Check
+
+Open these official pages manually:
+
+```text
+https://aqportal.discomap.eea.europa.eu/download-data/
+https://eeadmz1-downloads-webapp.azurewebsites.net/
+https://eeadmz1-downloads-api-appservice.azurewebsites.net/swagger/index.html
+https://eeadmz1-downloads-webapp.azurewebsites.net/content/documentation/How_To_Downloads.pdf
+https://www.eea.europa.eu/en/legal-notice
+https://www.eea.europa.eu/en/about/contact-us/faqs/can-i-use-eea-content-in-my-work-or-in-my-organisations-products
+```
+
+Record the decision. If rights are unclear, use `BLOCKED_SOURCE`.
+
+```bash
+source "$RUN_ROOT/logs/run_env.sh"
+SOURCE_RIGHTS_DECISION="REPLACE_WITH_ALLOWED_OR_BLOCKED_AND_REASON"
+
+cat >> "$RUN_ROOT/logs/operator_log.md" <<EOF
+
+## Official Source Links Checked
+Download page: https://aqportal.discomap.eea.europa.eu/download-data/
+Web application: https://eeadmz1-downloads-webapp.azurewebsites.net/
+API Swagger: https://eeadmz1-downloads-api-appservice.azurewebsites.net/swagger/index.html
+Documentation PDF: https://eeadmz1-downloads-webapp.azurewebsites.net/content/documentation/How_To_Downloads.pdf
+Legal notice: https://www.eea.europa.eu/en/legal-notice
+Reuse FAQ: https://www.eea.europa.eu/en/about/contact-us/faqs/can-i-use-eea-content-in-my-work-or-in-my-organisations-products
+
+## Source Rights Decision Recorded
+Sanitized public summaries allowed: $SOURCE_RIGHTS_DECISION
+Raw payload files committed: no
+Raw payload folder: $RUN_ROOT/raw
+EOF
+```
+
+- [ ] Download page opened.
+- [ ] Web application opened.
+- [ ] API Swagger opened.
+- [ ] Documentation PDF opened or attempted.
+- [ ] Legal/reuse pages opened.
+- [ ] Rights decision recorded.
+- [ ] If rights were unclear, I stopped and used `BLOCKED_SOURCE`.
+
+---
+
+## 5. Download Data
+
+Use the web application first. Use Swagger only if the web application fails.
+
+Fixed filters:
+
+```text
+Countries: NL, BE, DE
+Pollutant: PM10
+Dataset: verified E1a data
+Aggregation/type: daily records
+Start: 2018-01-01 or 2018-01-01T00:00:00Z
+End: 2024-12-31 or 2024-12-31T23:59:59Z
+City/locality: blank
+Email: blank unless you choose to provide one
+```
+
+Record web summary if available:
+
+```bash
+source "$RUN_ROOT/logs/run_env.sh"
+WEBAPP_SUMMARY_COUNT="REPLACE_WITH_UI_COUNT_OR_NOT_AVAILABLE"
+WEBAPP_SUMMARY_SIZE="REPLACE_WITH_UI_SIZE_OR_NOT_AVAILABLE"
+
+cat >> "$RUN_ROOT/logs/operator_log.md" <<EOF
+
+## Web Application Summary
+Summary count: $WEBAPP_SUMMARY_COUNT
+Summary size: $WEBAPP_SUMMARY_SIZE
+EOF
+```
+
+Move downloaded files outside the repository. Edit filenames before running:
+
+```bash
+mv "$HOME/Downloads/REPLACE_WITH_FILE.zip" "$RUN_ROOT/raw/"
+# or
+mv "$HOME/Downloads/REPLACE_WITH_FILE.parquet" "$RUN_ROOT/raw/"
+# or, if the UI gives URL lists:
+mv "$HOME/Downloads/REPLACE_WITH_URL_LIST.csv" "$RUN_ROOT/downloads/"
+```
+
+If using Swagger fallback, record the request:
+
+```bash
+API_REQUEST_USED="REPLACE_WITH_SWAGGER_REQUEST_URL_OR_BODY_OR_NOT_USED"
+API_HTTP_STATUS="REPLACE_WITH_HTTP_STATUS_OR_NOT_USED"
+
+cat >> "$RUN_ROOT/logs/operator_log.md" <<EOF
+
+## API Fallback
+API request used: $API_REQUEST_USED
+API HTTP status: $API_HTTP_STATUS
+EOF
+```
+
+If Swagger gives parquet URLs, paste them into `$RUN_ROOT/downloads/parquet_urls.txt`, then run:
+
+```bash
+touch "$RUN_ROOT/downloads/parquet_urls.txt"
+${EDITOR:-nano} "$RUN_ROOT/downloads/parquet_urls.txt"
+
+cd "$RUN_ROOT/raw"
+while IFS= read -r url; do
+  [ -z "$url" ] && continue
+  filename="$(basename "${url%%\?*}")"
+  curl -L --fail --retry 3 --output "$filename" "$url"
+done < "$RUN_ROOT/downloads/parquet_urls.txt"
+```
+
+Record files:
+
+```bash
+cat >> "$RUN_ROOT/logs/operator_log.md" <<EOF
+
+## Downloaded Files Stored Outside Repository
+Raw folder: $RUN_ROOT/raw
+$(find "$RUN_ROOT/raw" -maxdepth 1 -type f -print | sort)
+
+Download helper folder: $RUN_ROOT/downloads
+$(find "$RUN_ROOT/downloads" -maxdepth 1 -type f -print | sort)
+EOF
+```
+
+- [ ] Fixed filters used exactly.
+- [ ] Web application used, or Swagger fallback reason recorded.
+- [ ] Raw data moved to `$RUN_ROOT/raw`.
+- [ ] Helper URL files moved to `$RUN_ROOT/downloads`.
+- [ ] Downloaded files recorded.
+- [ ] If download failed, I stopped and used `BLOCKED_SOURCE`.
+
+---
+
+## 6. Freeze Raw Payloads
+
+```bash
+source "$RUN_ROOT/logs/run_env.sh"
+cd "$RUN_ROOT"
+
+find raw -type f | sort
+
+mkdir -p work/extracted
+find raw -name '*.zip' -print0 | while IFS= read -r -d '' z; do
+  unzip -n "$z" -d work/extracted
+done
+
+find raw work/extracted -type f | sort | xargs shasum -a 256 > hashes/raw_payloads.sha256
+shasum -a 256 hashes/raw_payloads.sha256 > hashes/raw_payloads_manifest.sha256
+
+cat >> logs/operator_log.md <<EOF
+
+## Raw Payload Hashes
+Raw payload manifest SHA-256: $(awk '{print $1}' hashes/raw_payloads_manifest.sha256)
+Raw payload files committed: no
+EOF
+```
+
+- [ ] Raw files listed.
+- [ ] ZIP files extracted to `$RUN_ROOT/work/extracted`, if present.
+- [ ] `raw_payloads.sha256` created.
+- [ ] `raw_payloads_manifest.sha256` created.
+- [ ] Manifest hash recorded.
+- [ ] No raw payload copied into the repository.
+
+---
+
+## 7. Create Local Processing Environment
+
+```bash
+source "$RUN_ROOT/logs/run_env.sh"
+cd "$RUN_ROOT"
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install pandas pyarrow
+
+python - <<'PY' | tee "$RUN_ROOT/work/runtime_versions.txt"
+import pandas as pd
+import pyarrow as pa
+import sys
+print("python", sys.version.replace("\n", " "))
+print("pandas", pd.__version__)
+print("pyarrow", pa.__version__)
+PY
+
+cat >> "$RUN_ROOT/logs/operator_log.md" <<EOF
+
+## Runtime Versions
+$(cat "$RUN_ROOT/work/runtime_versions.txt")
+EOF
+```
+
+- [ ] Virtual environment created outside repository.
+- [ ] `pandas` and `pyarrow` installed.
+- [ ] Runtime versions recorded.
+
+---
+
+## 8. Create Inspection Script
+
+This helper script runs after the protocol is frozen. Do not tune thresholds, dates, countries, or station-selection rules after seeing output.
+
+```bash
+source "$RUN_ROOT/logs/run_env.sh"
+cat > "$RUN_ROOT/scripts/inspect_eea_aq_d001.py" <<'PY'
+from __future__ import annotations
+import json, re
+from pathlib import Path
+import pandas as pd
+
+RUN_ROOT = Path(__file__).resolve().parents[1]
+OUT_DIR = RUN_ROOT / "reports"
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+START = pd.Timestamp("2018-01-01")
+END = pd.Timestamp("2024-12-31")
+EXPECTED_DAYS = (END - START).days + 1
+MIN_COVERAGE = 0.85
+COUNTRIES = {"NL", "BE", "DE"}
+INPUT_DIRS = [RUN_ROOT / "raw", RUN_ROOT / "work" / "extracted"]
+
+def norm(x): return str(x).strip().lower().replace(" ", "").replace("_", "").replace("-", "")
+
+def find_col(cols, names):
+    lookup = {norm(c): c for c in cols}
+    for n in names:
+        if norm(n) in lookup: return lookup[norm(n)]
+    for c in cols:
+        if any(norm(n) in norm(c) for n in names): return c
+    return None
+
+def files():
+    out = []
+    for root in INPUT_DIRS:
+        if root.exists():
+            out += [p for p in root.rglob("*") if p.is_file() and p.suffix.lower() in {".parquet", ".csv"}]
+    return sorted(out)
+
+def read(path):
+    return pd.read_parquet(path) if path.suffix.lower() == ".parquet" else pd.read_csv(path)
+
+def country_from_samplingpoint(v):
+    text = str(v).upper()
+    m = re.search(r"(?:^|[^A-Z])(NL|BE|DE)(?:[^A-Z]|$)", text)
+    return m.group(1) if m else text[:2]
+
+frames, file_summaries = [], []
+for path in files():
+    try:
+        df = read(path)
+    except Exception as exc:
+        file_summaries.append({"path": str(path), "read_error": repr(exc)})
+        continue
+    cols = list(df.columns)
+    sampling_col = find_col(cols, ["Samplingpoint", "SamplingPoint", "sampling point"])
+    pollutant_col = find_col(cols, ["Pollutant", "component", "parameter"])
+    start_col = find_col(cols, ["Start", "DatetimeBegin", "begin", "date", "time"])
+    value_col = find_col(cols, ["Value", "Concentration", "result"])
+    unit_col = find_col(cols, ["Unit"])
+    agg_col = find_col(cols, ["AggType", "aggregation", "type", "frequency"])
+    country_col = find_col(cols, ["Country", "CountryCode", "country code"])
+    city_col = find_col(cols, ["City", "Locality", "municipality"])
+    file_summaries.append({"path": str(path), "rows": int(len(df)), "columns": cols,
+                           "sampling_col": sampling_col, "pollutant_col": pollutant_col,
+                           "start_col": start_col, "value_col": value_col,
+                           "agg_col": agg_col, "country_col": country_col, "city_col": city_col})
+    if any(c is None for c in [sampling_col, pollutant_col, start_col, value_col]):
+        continue
+    small = pd.DataFrame()
+    small["samplingpoint"] = df[sampling_col].astype(str)
+    small["pollutant"] = df[pollutant_col].astype(str)
+    small["start"] = pd.to_datetime(df[start_col], errors="coerce", utc=True).dt.tz_convert(None)
+    small["value"] = pd.to_numeric(df[value_col], errors="coerce")
+    small["unit"] = df[unit_col].astype(str) if unit_col else ""
+    small["aggtype"] = df[agg_col].astype(str) if agg_col else ""
+    small["country"] = df[country_col].astype(str).str.upper().str[:2] if country_col else small["samplingpoint"].map(country_from_samplingpoint)
+    small["city"] = df[city_col].astype(str) if city_col else ""
+    frames.append(small)
+
+data = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=["samplingpoint","pollutant","start","value","unit","aggtype","country","city"])
+filtered = data[data["country"].isin(COUNTRIES) & data["pollutant"].str.upper().str.contains("PM10", na=False) & (data["start"] >= START) & (data["start"] <= END) & data["value"].notna()].copy()
+if not filtered.empty and filtered["aggtype"].astype(str).str.len().sum() > 0:
+    daily = filtered["aggtype"].str.lower().str.contains("day|daily|24h|24 h", na=False)
+    if daily.any(): filtered = filtered[daily].copy()
+
+if filtered.empty:
+    grouped = pd.DataFrame(columns=["country","city","samplingpoint","observed_days","row_count","first_date","last_date","unit_values","expected_days","coverage_ratio","eligible"])
+else:
+    filtered["date"] = filtered["start"].dt.date
+    grouped = filtered.groupby(["country","city","samplingpoint"], dropna=False).agg(
+        observed_days=("date","nunique"), row_count=("value","size"), first_date=("date","min"),
+        last_date=("date","max"), unit_values=("unit", lambda x: sorted({str(v) for v in x if str(v)})[:5])
+    ).reset_index()
+    grouped["expected_days"] = EXPECTED_DAYS
+    grouped["coverage_ratio"] = grouped["observed_days"] / EXPECTED_DAYS
+    grouped["eligible"] = grouped["coverage_ratio"] >= MIN_COVERAGE
+    grouped = grouped.sort_values(["country","city","samplingpoint"], kind="stable")
+
+selected = grouped[grouped["eligible"]].groupby("country", group_keys=False).head(5) if not grouped.empty else grouped.copy()
+by_country = {}
+for country in sorted(COUNTRIES):
+    rows = grouped[grouped["country"] == country]
+    sel = selected[selected["country"] == country]
+    by_country[country] = {
+        "sampling_points_seen": int(rows["samplingpoint"].nunique()) if not rows.empty else 0,
+        "eligible_sampling_points": int(rows[rows["eligible"]]["samplingpoint"].nunique()) if not rows.empty else 0,
+        "selected_sampling_points": sel["samplingpoint"].tolist(),
+        "gate_passed": bool(len(sel) >= 5),
+    }
+
+if filtered.empty:
+    status, reason = "BLOCKED_SOURCE", "No usable PM10 daily records were parsed under the fixed protocol."
+elif all(v["gate_passed"] for v in by_country.values()):
+    status, reason = "PASSED_UNDER_PROTOCOL", "All fixed countries have at least five eligible PM10 daily sampling points."
+else:
+    status, reason = "INSUFFICIENT_COVERAGE", "At least one fixed country has fewer than five eligible PM10 daily sampling points."
+
+grouped.to_csv(OUT_DIR / "station_coverage.csv", index=False)
+selected.to_csv(OUT_DIR / "selected_sampling_points.csv", index=False)
+summary = {
+  "schema": "claimbound_eea_aq_d001_manual_summary_v1",
+  "track_id": "EEA_AQ_D001",
+  "source": {"name": "EEA Air Quality Download Service", "download_page": "https://aqportal.discomap.eea.europa.eu/download-data/", "web_application": "https://eeadmz1-downloads-webapp.azurewebsites.net/", "api_swagger": "https://eeadmz1-downloads-api-appservice.azurewebsites.net/swagger/index.html", "raw_payload_committed": False},
+  "fixed_scope": {"dataset": "verified E1a", "pollutant": "PM10", "countries": sorted(COUNTRIES), "period": "2018-01-01..2024-12-31", "aggregation": "daily records", "coverage_gate": "at least 85 percent daily coverage per sampling point", "selection_rule": "first five eligible sampling points per country after sorting"},
+  "file_summaries": file_summaries,
+  "by_country": by_country,
+  "result": {"result_status": status, "reason": reason},
+  "claim_boundary": {"allowed": "EEA AQ D-001 source-readiness and PM10 daily coverage status under the fixed manual protocol only.", "forbidden": ["air-quality forecasting performance", "deployment readiness", "model superiority", "health-impact claim", "raw payload redistribution"]},
+}
+(OUT_DIR / "eea_aq_d001_manual_summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+print(json.dumps(summary["result"], indent=2, sort_keys=True))
+PY
+```
+
+- [ ] Script created under `$RUN_ROOT/scripts`.
+- [ ] I did not edit scope, threshold, countries, pollutant, period, or station-selection rule.
+
+---
+
+## 9. Run And Review
+
+```bash
+source "$RUN_ROOT/logs/run_env.sh"
+cd "$RUN_ROOT"
+. .venv/bin/activate
+python scripts/inspect_eea_aq_d001.py
+python3 -m json.tool reports/eea_aq_d001_manual_summary.json | less
+```
+
+Inspect coverage:
+
+```bash
+python - <<'PY'
+import pandas as pd, os
+root = os.environ["RUN_ROOT"]
+coverage = pd.read_csv(f"{root}/reports/station_coverage.csv")
+selected = pd.read_csv(f"{root}/reports/selected_sampling_points.csv")
+print("Coverage preview:")
+print(coverage.head(30).to_string(index=False))
+print("\nSelected sampling points:")
+print(selected.to_string(index=False))
+PY
+```
+
+Manual checks:
+
+- [ ] `result.result_status` read.
+- [ ] `result.reason` read.
+- [ ] `by_country` reviewed.
+- [ ] Countries are only `BE`, `DE`, `NL`, or deviation/block reason recorded.
+- [ ] Sampling points are not blank, or deviation/block reason recorded.
+- [ ] Coverage ratio is plausible: `observed_days / expected_days`.
+- [ ] Selected stations follow the fixed sorting rule.
+- [ ] I did not change stations or threshold after seeing coverage.
+
+Record final status:
+
+```bash
+FINAL_STATUS="$(python3 - <<'PY'
+import json, os
+root = os.environ["RUN_ROOT"]
+with open(f"{root}/reports/eea_aq_d001_manual_summary.json", encoding="utf-8") as f:
+    print(json.load(f)["result"]["result_status"])
+PY
+)"
+FINAL_REASON="$(python3 - <<'PY'
+import json, os
+root = os.environ["RUN_ROOT"]
+with open(f"{root}/reports/eea_aq_d001_manual_summary.json", encoding="utf-8") as f:
+    print(json.load(f)["result"]["reason"])
+PY
+)"
+
+cat >> "$RUN_ROOT/logs/operator_log.md" <<EOF
+
+## Final Manual Status
+Result status: $FINAL_STATUS
+Reason: $FINAL_REASON
+Deviations: none
+Known limitations: source-readiness and coverage audit only; no forecasting, health-impact, deployment-readiness, or model-superiority claim
+EOF
+```
+
+- [ ] Final status recorded.
+- [ ] Final reason recorded.
+- [ ] Deviations recorded, even if `none`.
+- [ ] Limitations recorded.
+
+---
+
+## 10. Blocked Track Path
+
+Use only if access, rights, metadata, timestamps, units, download, or file format prevents a fair run.
+
+```bash
+source "$RUN_ROOT/logs/run_env.sh"
+BLOCK_REASON="REPLACE_WITH_EXACT_BLOCK_REASON"
+python3 - <<PY
+import json, os
+root = os.environ["RUN_ROOT"]
+summary = {
+  "schema": "claimbound_eea_aq_d001_manual_summary_v1",
+  "track_id": "EEA_AQ_D001",
+  "source": {"name": "EEA Air Quality Download Service", "download_page": "https://aqportal.discomap.eea.europa.eu/download-data/", "web_application": "https://eeadmz1-downloads-webapp.azurewebsites.net/", "api_swagger": "https://eeadmz1-downloads-api-appservice.azurewebsites.net/swagger/index.html", "raw_payload_committed": False},
+  "fixed_scope": {"dataset": "verified E1a", "pollutant": "PM10", "countries": ["BE", "DE", "NL"], "period": "2018-01-01..2024-12-31", "aggregation": "daily records", "coverage_gate": "at least 85 percent daily coverage per sampling point", "selection_rule": "first five eligible sampling points per country after sorting"},
+  "by_country": {},
+  "result": {"result_status": "BLOCKED_SOURCE", "reason": "$BLOCK_REASON"},
+  "claim_boundary": {"allowed": "EEA AQ D-001 blocked-source status under the fixed manual protocol only.", "forbidden": ["air-quality forecasting performance", "deployment readiness", "model superiority", "health-impact claim", "raw payload redistribution"]},
+}
+open(f"{root}/reports/eea_aq_d001_manual_summary.json", "w", encoding="utf-8").write(json.dumps(summary, indent=2, sort_keys=True) + "\n")
+PY
+
+cat >> "$RUN_ROOT/logs/operator_log.md" <<EOF
+
+## Blocked Track Decision
+Result status: BLOCKED_SOURCE
+Reason: $BLOCK_REASON
+Raw payload files committed: no
+EOF
+```
+
+- [ ] Exact block reason recorded.
+- [ ] Blocked summary JSON created.
+- [ ] Raw payloads not committed.
+- [ ] Blocked result not hidden.
+
+---
+
+## 11. Create Public Artifacts
+
+```bash
+source "$RUN_ROOT/logs/run_env.sh"
+cd "$CLAIMBOUND_REPO"
+
+git switch -c manual/eea-aq-d001-result
+mkdir -p artifacts docs/evidence_cards
+cp "$RUN_ROOT/reports/eea_aq_d001_manual_summary.json" artifacts/eea_aq_d001_manual_summary.json
+
+SUMMARY_SHA="$(shasum -a 256 artifacts/eea_aq_d001_manual_summary.json | awk '{print $1}')"
+RAW_MANIFEST_SHA="$(awk '{print $1}' "$RUN_ROOT/hashes/raw_payloads_manifest.sha256" 2>/dev/null || printf 'not_available')"
+CARD_DATE="$(date -u +%Y-%m-%d)"
+CARD_PATH="docs/evidence_cards/CLAIMBOUND-EEA-AQ-D001-${CARD_DATE}.json"
+STATUS="$(python3 - <<'PY'
+import json
+with open("artifacts/eea_aq_d001_manual_summary.json", encoding="utf-8") as f: print(json.load(f)["result"]["result_status"])
+PY
+)"
+REASON="$(python3 - <<'PY'
+import json
+with open("artifacts/eea_aq_d001_manual_summary.json", encoding="utf-8") as f: print(json.load(f)["result"]["reason"])
+PY
+)"
+
+python3 - <<PY
+import json
+from pathlib import Path
+card = {
+  "access_date": "$CARD_DATE",
+  "ai_assistance": "not used during manual status decision",
+  "baseline_control_summary": "Fixed source-readiness controls: official source, verified E1a dataset, PM10 pollutant, BE/DE/NL country set, daily aggregation, 2018-2024 period, 85 percent coverage gate, first five eligible sampling points per country.",
+  "card_svg_template": "docs/assets/claimbound_evidence_card.svg",
+  "claim_boundary": "EEA AQ D-001 reports only source-readiness and PM10 daily coverage status under the fixed manual protocol.",
+  "claim_type": "source audit",
+  "created_at": "$CARD_DATE",
+  "domain": "air-quality",
+  "evidence_id": "CLAIMBOUND-EEA-AQ-D001-$CARD_DATE",
+  "evidence_url": "https://github.com/NeoZorK/claimbound-public-benchmarks/blob/main/$CARD_PATH",
+  "execution_mode": "$EXECUTION_MODE",
+  "git_commit": "$(git rev-parse --short HEAD)",
+  "known_limitations": ["source-readiness and coverage audit only", "no forecasting-performance claim", "no deployment-readiness claim", "no model-superiority claim", "no health-impact claim", "no raw payloads committed"],
+  "manual_review": "operator reviewed source access, source rights, raw payload boundary, station selection and final status",
+  "official_source_name": "EEA Air Quality Download Service",
+  "official_source_url": "https://eeadmz1-downloads-webapp.azurewebsites.net/",
+  "operator": "$OPERATOR_NAME",
+  "protocol_id": "EEA_AQ_D001",
+  "protocol_version": "manual-track-v1",
+  "raw_payload_committed": False,
+  "raw_payload_manifest": "external raw payload manifest SHA-256: $RAW_MANIFEST_SHA",
+  "reproduction_level": "not independently reproduced",
+  "result_reason": "$REASON",
+  "result_status": "$STATUS",
+  "runner_command": "manual runbook docs/manual_audit/EEA_AQ_D001_MANUAL_TRACK.md plus local external inspection script",
+  "sanitized_report_path": "artifacts/eea_aq_d001_manual_summary.json",
+  "sanitized_report_sha256": "$SUMMARY_SHA",
+  "source_rights_note": "Official public EEA source; raw payloads are not committed."
+}
+Path("$CARD_PATH").write_text(json.dumps(card, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+PY
+
+python3 -m json.tool "$CARD_PATH" >/tmp/claimbound_card_check.json
+if [ -f scripts/claimbound_validate_evidence_card.py ]; then
+  uv run --extra dev python scripts/claimbound_validate_evidence_card.py "$CARD_PATH"
+fi
+```
+
+Create SVG card:
+
+```bash
+SVG_PATH="${CARD_PATH%.json}.svg"
+cp docs/assets/claimbound_evidence_card.svg "$SVG_PATH"
+printf 'Fill SVG placeholders from JSON card: %s\n' "$CARD_PATH"
+rg "\{\{" "$SVG_PATH" || true
+```
+
+Manual SVG replacements:
+
+```text
+{{status_exact}} -> result_status
+{{reproduction_level}} -> not independently reproduced
+{{allowed_claim_sentence}} -> EEA AQ D-001 source-readiness status recorded
+{{record_id}} -> EEA-AQ-D001
+{{protocol_id}} -> EEA_AQ_D001 manual-track-v1
+{{target_definition}} -> PM10 daily source coverage
+{{candidate_definition}} -> official EEA E1a records
+{{controls_and_gate}} -> 85 percent coverage, 5 stations per country
+{{source_name}} -> EEA Air Quality Download Service
+{{period_scope}} -> 2018-2024, BE/DE/NL
+{{evidence_date}} -> CARD_DATE
+{{artifact_ref}} -> short commit plus sanitized summary
+{{evidence_url}} -> CARD_PATH
+```
+
+Update `docs/registry/evidence_index.json` manually, then validate:
+
+```bash
+python3 -m json.tool docs/registry/evidence_index.json >/tmp/claimbound_registry_check.json
+```
+
+- [ ] New branch created.
+- [ ] Only sanitized summary copied into `artifacts/`.
+- [ ] Evidence card JSON created and validated.
+- [ ] SVG copied and placeholders filled.
+- [ ] SVG status matches JSON status.
+- [ ] Registry entry and counts updated.
+- [ ] Registry JSON validates.
+
+---
+
+## 12. Final Checks And PR
+
+```bash
+cd "$CLAIMBOUND_REPO"
+
+if command -v uv >/dev/null 2>&1; then
+  uv run --extra dev python -m pytest -n auto
+else
+  python3 -m pytest -n auto
+fi
+
+find . \
+  \( -path ./.git -o -path ./.venv -o -path ./.pytest_cache -o -path ./__pycache__ \) -prune \
+  -o -type f \
+  \( -name '*.csv' -o -name '*.parquet' -o -name '*.zip' -o -name '*.jsonl' -o -name '*.env' -o -name '*.key' -o -name '*.pem' \) \
+  -print
+
+rg -n -i "universal forecasting edge|deployment readiness|best model|model superiority|breakthrough|health impact" artifacts docs
+
+git status --short
+```
+
+Expected:
+
+- tests pass, or failure is explained in the PR;
+- raw-payload scan does not show raw downloaded data;
+- broad-claim scan only shows forbidden/limitation contexts;
+- `git status --short` shows only intended public files.
+
+Stage and commit:
+
+```bash
+git add artifacts/eea_aq_d001_manual_summary.json
+git add docs/evidence_cards/CLAIMBOUND-EEA-AQ-D001-*.json
+git add docs/evidence_cards/CLAIMBOUND-EEA-AQ-D001-*.svg
+git add docs/registry/evidence_index.json
+
+git status --short
+git commit -m "docs: add EEA AQ D-001 manual evidence card"
+git push -u origin manual/eea-aq-d001-result
+```
+
+PR body:
+
+```text
+Summary:
+- ran EEA AQ D-001 manual source-readiness track
+- added sanitized summary
+- added evidence card JSON/SVG
+- updated public registry index
+
+Verification:
+- protocol lock created before data inspection
+- evidence-card JSON validated
+- registry JSON validated
+- pytest passed, or noted below if unavailable/failed
+- raw payload scan clean
+- broad-claim scan clean
+
+Raw payload policy:
+- raw files stored outside repository
+- raw payload manifest hash recorded externally
+
+Result:
+- result_status: REPLACE_WITH_FINAL_STATUS
+- reason: REPLACE_WITH_FINAL_REASON
+
+Limitations:
+- source-readiness and coverage audit only
+- no forecasting-performance claim
+- no deployment-readiness claim
+- no model-superiority claim
+- no health-impact claim
+```
+
+- [ ] Tests completed or PR explains why not.
+- [ ] Raw payload scan clean.
+- [ ] Broad claim scan clean or only forbidden-context matches.
+- [ ] Only intended public files staged.
+- [ ] PR body includes result status, reason, verification, raw-payload policy, and limitations.
+- [ ] If checks fail, I will fix only the real issue and will not change the result status to pass checks.
+
+---
+
+## Final Review Before Merge
+
+- [ ] Protocol stayed fixed from the beginning.
+- [ ] Protocol lock was hashed before source/data outcome inspection.
+- [ ] Raw payloads stayed outside the repository.
+- [ ] Source-rights note is honest.
+- [ ] Selected stations follow the sorting rule.
+- [ ] Coverage uses the fixed 85 percent threshold.
+- [ ] Public summary avoids raw payload details.
+- [ ] Evidence card validates.
+- [ ] SVG matches JSON card.
+- [ ] Registry index points to the right card.
+- [ ] Final claim stays inside source-readiness and coverage only.
+- [ ] Insufficient, blocked, or negative result is recorded without shame.
+- [ ] If passed, limitations are still visible.
+
+---
+
+## What To Share After Merge
+
+Share:
+
+- pull request;
+- sanitized summary JSON;
+- evidence card JSON;
+- evidence card SVG;
+- registry index entry.
 
 Do not share:
 
 - raw parquet files;
 - raw ZIP files;
-- browser screenshots containing local paths;
+- raw source CSV files;
+- browser screenshots with local paths;
 - private notes;
+- tokens, keys, local env files;
 - claims outside this protocol.
